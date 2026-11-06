@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Assets Inventory | GhatMitra (ఘాట్ మిత్ర){% endblock %}
+
+{% block content %}
+<div>
+  <!-- Thin Kolam Banner Header -->
+  <div class="inner-page-banner">
+    <div>
+      <h2>
+        <span>📦</span> Pushkaralu Asset Fleet &amp; Facilities Grid ({{ assets|length }})
+      </h2>
+      <p>
+        Real-time operational monitoring for bio-toilets, compactor bins, high-mast floodlights, CCTV feeds, and generators.
+      </p>
+    </div>
+    <div style="font-size: 0.8rem; color: #cbd5e1; font-weight: 600;">
+      Fleet Status: 40 Units Deployed
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <form method="get" action="/assets" class="filter-bar">
+    <div>
+      <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 2px;">Asset Type:</label>
+      <select name="type" class="form-select" onchange="this.form.submit()">
+        <option value="">All Types</option>
+        {% for t in types %}
+        <option value="{{ t }}" {% if selected_type == t %}selected{% endif %}>{{ t | title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div>
+      <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 2px;">Status:</label>
+      <select name="status" class="form-select" onchange="this.form.submit()">
+        <option value="">All Statuses</option>
+        <option value="working" {% if selected_status == 'working' %}selected{% endif %}>Working</option>
+        <option value="faulty" {% if selected_status == 'faulty' %}selected{% endif %}>Faulty (10%)</option>
+        <option value="under maintenance" {% if selected_status == 'under maintenance' %}selected{% endif %}>Under Maintenance</option>
+      </select>
+    </div>
+
+    <div>
+      <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 2px;">Ghat:</label>
+      <select name="ghat_id" class="form-select" onchange="this.form.submit()">
+        <option value="">All Ghats</option>
+        {% for g in ghats %}
+        <option value="{{ g.id }}" {% if selected_ghat == g.id %}selected{% endif %}>{{ g.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div style="margin-top: 18px;">
+      <a href="/assets" class="btn btn-secondary btn-sm">Reset Filters</a>
+    </div>
+  </form>
+
+  <!-- Assets Table -->
+  <div class="content-card" style="padding: 0; overflow: hidden;">
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Asset Name</th>
+            <th>Type</th>
+            <th>Deployment Ghat</th>
+            <th>Operational Status</th>
+            <th>Last Service</th>
+            <th>Next Scheduled Service</th>
+            <th>Quick Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in assets %}
+          <tr>
+            <td><strong>#{{ a.id }}</strong></td>
+            <td>
+              <div style="font-weight: 700; color: #0f172a;">{{ a.name }}</div>
+            </td>
+            <td>
+              <span class="cat-badge-wrap" style="font-size: 0.8rem; font-weight: 600; background: #ede9fe; color: #6d28d9; padding: 3px 8px; border-radius: 6px;">
+                {% if a.type == 'mobile toilet' %}
+                <img src="/static/img/toilet_block.svg" class="cat-icon" alt="Toilet">
+                {% elif a.type == 'light' %}
+                <img src="/static/img/solar_light.svg" class="cat-icon" alt="Light">
+                {% endif %}
+                {{ a.type | title }}
+              </span>
+            </td>
+            <td><strong>{{ a.ghat.name }}</strong></td>
+            <td>
+              <span class="badge {% if a.status == 'faulty' %}badge-faulty{% elif a.status == 'under maintenance' %}badge-maintenance{% else %}badge-working{% endif %}">
+                {{ a.status }}
+              </span>
+            </td>
+            <td style="font-size: 0.82rem; color: #475569;">
+              {{ a.last_service_date.strftime('%d %b %Y') if a.last_service_date else 'N/A' }}
+            </td>
+            <td style="font-size: 0.82rem; color: #475569;">
+              {% if a.next_service_date %}
+                {{ a.next_service_date.strftime('%d %b %Y') }}
+                {% if a.status == 'faulty' %}
+                <span style="color: #ef4444; font-weight: 700;">(Overdue)</span>
+                {% endif %}
+              {% else %}
+                N/A
+              {% endif %}
+            </td>
+            <td>
+              <select class="form-select" style="font-size: 0.75rem; padding: 4px 6px;" onchange="updateAssetStatus({{ a.id }}, this.value)">
+                <option value="working" {% if a.status == 'working' %}selected{% endif %}>Mark Working</option>
+                <option value="faulty" {% if a.status == 'faulty' %}selected{% endif %}>Mark Faulty</option>
+                <option value="under maintenance" {% if a.status == 'under maintenance' %}selected{% endif %}>Maintenance</option>
+              </select>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

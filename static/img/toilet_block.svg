@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <!-- Modular Toilet Sanitation Block -->
+  <rect width="80" height="80" rx="16" fill="#f0fdf4" />
+  
+  <!-- Foundation Plinth -->
+  <rect x="14" y="60" width="52" height="6" rx="2" fill="#64748b" />
+  
+  <!-- Main Modular Cabin -->
+  <rect x="18" y="24" width="44" height="38" rx="4" fill="#0284c7" />
+  <rect x="18" y="20" width="44" height="6" rx="2" fill="#0369a1" />
+  
+  <!-- Door 1 -->
+  <rect x="22" y="30" width="16" height="32" rx="2" fill="#e0f2fe" />
+  <circle cx="34" cy="46" r="1.5" fill="#0369a1" />
+  <rect x="26" y="34" width="8" height="3" rx="1" fill="#0284c7" />
+
+  <!-- Door 2 -->
+  <rect x="42" y="30" width="16" height="32" rx="2" fill="#e0f2fe" />
+  <circle cx="54" cy="46" r="1.5" fill="#0369a1" />
+  <rect x="46" y="34" width="8" height="3" rx="1" fill="#0284c7" />
+
+  <!-- Overhead Bio-Water Tank -->
+  <ellipse cx="40" cy="14" rx="12" ry="5" fill="#16a34a" />
+  <rect x="28" y="14" width="24" height="7" fill="#15803d" />
+  <ellipse cx="40" cy="21" rx="12" ry="4" fill="#16a34a" />
+</svg>

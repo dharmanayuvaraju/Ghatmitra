@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none" stroke="rgba(255, 237, 213, 0.4)" stroke-width="1.4">
+  <!-- Traditional Symmetric Kolam / Rangoli Motif -->
+  <g transform="translate(80, 80)">
+    <!-- Central Lotus / Mandala -->
+    <circle cx="0" cy="0" r="10" stroke-width="1.8" />
+    <circle cx="0" cy="0" r="22" stroke-dasharray="4,4" />
+    
+    <!-- 8 Petal Loops -->
+    <path d="M0 -10 C 12 -28, 12 -38, 0 -48 C -12 -38, -12 -28, 0 -10 Z" />
+    <path d="M0 10 C 12 28, 12 38, 0 48 C -12 38, -12 28, 0 10 Z" />
+    <path d="M-10 0 C -28 12, -38 12, -48 0 C -38 -12, -28 -12, -10 0 Z" />
+    <path d="M10 0 C 28 12, 38 12, 48 0 C 38 -12, 28 -12, 10 0 Z" />
+
+    <!-- Diagonal Petals -->
+    <g transform="rotate(45)">
+      <path d="M0 -10 C 10 -26, 10 -34, 0 -42 C -10 -34, -10 -26, 0 -10 Z" />
+      <path d="M0 10 C 10 26, 10 34, 0 42 C -10 34, -10 26, 0 10 Z" />
+      <path d="M-10 0 C -26 10, -34 10, -42 0 C -34 -10, -26 -10, -10 0 Z" />
+      <path d="M10 0 C 26 10, 34 10, 42 0 C 34 -10, 26 -10, 10 0 Z" />
+    </g>
+
+    <!-- Outer Ornamental Corners -->
+    <path d="M-55 -55 Q -40 -70, -25 -55 Q -10 -70, 0 -55" />
+    <path d="M55 -55 Q 40 -70, 25 -55 Q 10 -70, 0 -55" />
+    <path d="M-55 55 Q -40 70, -25 55 Q -10 70, 0 55" />
+    <path d="M55 55 Q 40 70, 25 55 Q 10 70, 0 55" />
+    
+    <circle cx="0" cy="-62" r="2.5" fill="rgba(255, 237, 213, 0.5)" />
+    <circle cx="0" cy="62" r="2.5" fill="rgba(255, 237, 213, 0.5)" />
+    <circle cx="-62" cy="0" r="2.5" fill="rgba(255, 237, 213, 0.5)" />
+    <circle cx="62" cy="0" r="2.5" fill="rgba(255, 237, 213, 0.5)" />
+  </g>
+</svg>

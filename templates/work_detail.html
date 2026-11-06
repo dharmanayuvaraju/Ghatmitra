@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}{{ work.title }} | GhatMitra (ఘాట్ మిత్ర){% endblock %}
+
+{% block content %}
+<div>
+  <!-- Breadcrumb -->
+  <div style="margin-bottom: 14px; font-size: 0.85rem; color: #64748b;">
+    <a href="/works" style="color: #ea580c; text-decoration: none; font-weight: 600;">&larr; Back to Works Directory</a>
+    <span> / Work #{{ work.id }}</span>
+  </div>
+
+  <!-- Header Card -->
+  <div class="content-card" style="border-top: 4px solid {% if work.status == 'delayed' %}#ef4444{% elif work.status == 'completed' %}#10b981{% else %}#f59e0b{% endif %};">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px; margin-bottom: 16px;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+          <span style="font-size: 0.82rem; font-weight: 700; background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 4px;">
+            {{ work.category | title }}
+          </span>
+          <span class="badge {% if work.status == 'delayed' %}badge-delayed{% elif work.status == 'completed' %}badge-completed{% elif work.status == 'on track' %}badge-ontrack{% else %}badge-notstarted{% endif %}">
+            {{ work.status }}
+          </span>
+        </div>
+        <h1 style="font-size: 1.6rem; font-weight: 900; color: #0f172a; margin: 0;">{{ work.title }}</h1>
+        <p style="font-size: 0.88rem; color: #64748b; margin-top: 4px;">
+          Ghat: <strong>{{ work.ghat.name }}</strong> &bull; GPS: {{ work.latitude }}, {{ work.longitude }}
+        </p>
+      </div>
+
+      <button class="btn btn-primary" onclick="openUpdateModal({{ work.id }}, '{{ work.title | escape }}', {{ work.progress_pct }})">
+        + Log Progress Update
+      </button>
+    </div>
+
+    <!-- Quick Stats Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; background: #f8fafc; padding: 16px; border-radius: 10px; border: 1px solid var(--border-slate);">
+      <div>
+        <span style="font-size: 0.75rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Sanctioned Budget</span>
+        <div style="font-size: 1.25rem; font-weight: 800; color: #0f172a;">₹{{ "{:,.0f}".format(work.budget) }}</div>
+      </div>
+      <div>
+        <span style="font-size: 0.75rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Current Progress</span>
+        <div style="font-size: 1.25rem; font-weight: 800; color: #ea580c;">{{ work.progress_pct }}%</div>
+        <div class="progress-track" style="margin-top: 4px;">
+          <div class="progress-fill" style="width: {{ work.progress_pct }}%; background: {% if work.status == 'delayed' %}#ef4444{% elif work.status == 'completed' %}#10b981{% else %}#f59e0b{% endif %};"></div>
+        </div>
+      </div>
+      <div>
+        <span style="font-size: 0.75rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Assigned Contractor</span>
+        <div style="font-size: 0.95rem; font-weight: 800; color: #0f172a;">{{ work.vendor.name }}</div>
+        <div style="font-size: 0.78rem; color: #64748b;">Contact: {{ work.vendor.contact_person }}</div>
+      </div>
+      <div>
+        <span style="font-size: 0.75rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Schedule Timeline</span>
+        <div style="font-size: 0.82rem; font-weight: 700; color: #334155;">
+          {{ work.planned_start.strftime('%d %b %Y') }} &rarr; {{ work.planned_end.strftime('%d %b %Y') }}
+        </div>
+        <div style="font-size: 0.75rem; color: #64748b;">Last Updated: {{ work.last_updated.strftime('%d %b, %H:%M') }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timeline of Updates & Alerts -->
+  <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+    
+    <!-- Updates Timeline -->
+    <div class="content-card">
+      <h2 class="card-title" style="margin-bottom: 16px;">
+        <span>📝</span> Inspection &amp; Progress Updates Timeline ({{ updates|length }})
+      </h2>
+
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        {% for u in updates %}
+        <div style="border-left: 3px solid #ea580c; padding-left: 14px; position: relative;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <span class="badge badge-completed">{{ u.progress_pct }}% Progress</span>
+            <span style="font-size: 0.75rem; color: #64748b;">{{ u.created_at.strftime('%d %b %Y, %I:%M %p') }}</span>
+          </div>
+          <p style="font-size: 0.88rem; color: #334155; margin-bottom: 6px; line-height: 1.4;">
+            {{ u.note }}
+          </p>
+          <div style="font-size: 0.76rem; color: #64748b;">
+            Logged by: <strong>{{ u.updated_by }}</strong>
+          </div>
+        </div>
+        {% else %}
+        <p style="color: #64748b; font-size: 0.88rem;">No inspection updates logged yet for this work package.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Related Alerts -->
+    <div class="content-card">
+      <h2 class="card-title" style="margin-bottom: 16px; color: #991b1b;">
+        <span>⚠️</span> Associated Alerts ({{ alerts|length }})
+      </h2>
+
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        {% for a in alerts %}
+        <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+            <strong style="font-size: 0.85rem; color: #991b1b;">{{ a.type }}</strong>
+            <span class="badge badge-{{ a.severity }}">{{ a.severity }}</span>
+          </div>
+          <p style="font-size: 0.8rem; color: #475569; margin-bottom: 6px;">{{ a.message }}</p>
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; color: #64748b;">
+            <span>Status: <strong>{{ a.status }}</strong></span>
+            {% if a.status == 'open' %}
+            <button class="btn btn-secondary btn-sm" onclick="resolveAlert({{ a.id }})" style="font-size: 0.7rem; padding: 2px 6px;">Resolve</button>
+            {% endif %}
+          </div>
+        </div>
+        {% else %}
+        <p style="color: #10b981; font-weight: 600; font-size: 0.85rem;">✓ No active alerts associated with this work package.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal: Update Work Progress -->
+<div id="update-modal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700;">Log Field Work Update</h3>
+      <button onclick="closeUpdateModal()" style="background: none; border: none; color: white; font-size: 1.4rem; cursor: pointer;">&times;</button>
+    </div>
+    <form class="modal-body" onsubmit="submitWorkUpdate(event)">
+      <input type="hidden" id="modal-work-id" value="{{ work.id }}">
+      
+      <div style="margin-bottom: 14px;">
+        <label style="font-size: 0.82rem; font-weight: 700; color: #64748b;">Work Package:</label>
+        <div id="modal-work-title" style="font-weight: 800; color: #0f172a; font-size: 1rem;">{{ work.title }}</div>
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+          <label style="font-size: 0.82rem; font-weight: 700; color: #334155;">Work Progress Percentage:</label>
+          <span id="modal-progress-val" style="font-weight: 800; color: #ea580c; font-size: 1.1rem;">{{ work.progress_pct }}%</span>
+        </div>
+        <input type="range" id="modal-progress" min="0" max="100" value="{{ work.progress_pct }}" class="form-input" style="width: 100%;" oninput="document.getElementById('modal-progress-val').innerText = this.value + '%'">
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <label style="font-size: 0.82rem; font-weight: 700; color: #334155; display: block; margin-bottom: 4px;">Field Inspection Note: *</label>
+        <textarea id="modal-note" class="form-input" style="width: 100%; height: 80px;" placeholder="Describe on-ground progress, material delivery, testing, or bottlenecks..." required></textarea>
+      </div>
+
+      <div style="margin-bottom: 18px;">
+        <label style="font-size: 0.82rem; font-weight: 700; color: #334155; display: block; margin-bottom: 4px;">Inspecting Engineer / Officer: *</label>
+        <input type="text" id="modal-updated-by" class="form-input" style="width: 100%;" value="Er. M. Rao (Executive Engineer)" required>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 8px;">
+        <button type="button" class="btn btn-secondary" onclick="closeUpdateModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Work Update</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+

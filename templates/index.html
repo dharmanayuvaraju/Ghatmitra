@@ -1,0 +1,1084 @@
+{% extends "base.html" %}
+
+{% block title %}Control Room | GhatMitra (ఘాట్ మిత్ర){% endblock %}
+
+{% block head_extra %}
+<!-- Leaflet & MarkerCluster CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+
+<!-- Leaflet & MarkerCluster JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<style>
+  #hub-map {
+    height: 480px;
+    width: 100%;
+    border-radius: var(--radius-sm);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- =========================================================================
+     VIEW 1: HOME HUB (#view-home)
+     ========================================================================= -->
+<div id="view-home" class="hub-view active">
+
+  <!-- HERO BANNER WITH REAL LAYERED GODAVARI ANIMATIONS -->
+  <div class="countdown-banner" id="banner-section">
+    <!-- Pulsing Sunrise Glow -->
+    <div class="hero-sunrise-glow" aria-hidden="true"></div>
+
+    <!-- Gopuram, Bell Tower & Palm Trees Silhouette -->
+    <div class="hero-temple-bg" aria-hidden="true"></div>
+
+    <!-- Crossing Birds in Flight -->
+    <div class="hero-bird" aria-hidden="true"></div>
+
+    <!-- Drifting Pilgrim Boats -->
+    <div class="hero-boat hero-boat-1" aria-hidden="true" title="Godavari Boat"></div>
+    <div class="hero-boat hero-boat-2" aria-hidden="true"></div>
+
+    <!-- Gently Floating Sacred Diya Lamp -->
+    <div class="hero-diya" aria-hidden="true" title="Sacred Godavari Diya"></div>
+
+    <!-- 18 Golden Floating Particles -->
+    <div class="particle-container" aria-hidden="true">
+      <span class="golden-particle" style="left: 6%; animation-delay: 0s;"></span>
+      <span class="golden-particle" style="left: 14%; animation-delay: 2.5s;"></span>
+      <span class="golden-particle" style="left: 21%; animation-delay: 5s;"></span>
+      <span class="golden-particle" style="left: 28%; animation-delay: 1.2s;"></span>
+      <span class="golden-particle" style="left: 35%; animation-delay: 7s;"></span>
+      <span class="golden-particle" style="left: 42%; animation-delay: 3.8s;"></span>
+      <span class="golden-particle" style="left: 49%; animation-delay: 9s;"></span>
+      <span class="golden-particle" style="left: 56%; animation-delay: 0.6s;"></span>
+      <span class="golden-particle" style="left: 63%; animation-delay: 6.2s;"></span>
+      <span class="golden-particle" style="left: 70%; animation-delay: 4.1s;"></span>
+      <span class="golden-particle" style="left: 77%; animation-delay: 8.5s;"></span>
+      <span class="golden-particle" style="left: 84%; animation-delay: 2.1s;"></span>
+      <span class="golden-particle" style="left: 91%; animation-delay: 7.8s;"></span>
+      <span class="golden-particle" style="left: 18%; animation-delay: 10s;"></span>
+      <span class="golden-particle" style="left: 52%; animation-delay: 11.5s;"></span>
+      <span class="golden-particle" style="left: 67%; animation-delay: 12.2s;"></span>
+      <span class="golden-particle" style="left: 80%; animation-delay: 3.2s;"></span>
+      <span class="golden-particle" style="left: 95%; animation-delay: 5.8s;"></span>
+    </div>
+
+    <!-- 3 Flowing Godavari River Wave Layers -->
+    <div class="hero-waves-wrapper" aria-hidden="true">
+      <div class="hero-wave-layer hero-wave-1"></div>
+      <div class="hero-wave-layer hero-wave-2"></div>
+      <div class="hero-wave-layer hero-wave-3"></div>
+    </div>
+
+    <!-- Left Hero Content -->
+    <div class="hero-content-block">
+      <div style="font-size: 0.8rem; font-weight: 800; color: #ffedd5; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+        <span>🚩</span> GODAVARI PUSHKARALU 2027 COUNTDOWN (TARGET: 26 JUN 2027)
+      </div>
+      <div style="display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;">
+        <span class="countdown-digits" id="countdown-days">{{ summary.days_left }}</span>
+        <span style="font-size: 1.15rem; font-weight: 700; color: #cbd5e1;">Days Remaining to Sacred Pushkar Snanam</span>
+      </div>
+      <div style="font-size: 0.82rem; color: #94a3b8; margin-top: 6px;">
+        GhatMitra (ఘాట్ మిత్ర) &bull; Rajamahendravaram Municipal Corporation &bull; 5 Godavari Ghats
+      </div>
+    </div>
+
+    <!-- Right Financial Risk Metric -->
+    <div class="hero-metric-block" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); border-radius: var(--radius-sm); padding: 14px 22px; text-align: right; min-width: 250px;">
+      <div style="font-size: 0.74rem; color: #cbd5e1; text-transform: uppercase; font-weight: 800; letter-spacing: 0.4px;">
+        ⚠️ Budget at Risk (Delayed Works)
+      </div>
+      <div style="font-size: 1.7rem; font-weight: 900; color: #fca5a5; margin: 3px 0;">
+        <span id="budget-at-risk-amt">₹{{ "{:,.0f}".format(summary.budget.delayed_budget) }}</span>
+        <span style="font-size: 0.88rem; color: #f87171; font-weight: 800;" id="budget-at-risk-pct">({{ summary.budget.delayed_budget_pct }}%)</span>
+      </div>
+      <div style="font-size: 0.76rem; color: #94a3b8;">
+        Total Sanctioned: <strong style="color: #f1f5f9;">₹{{ "{:,.0f}".format(summary.budget.total_budget) }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7 BIG FEATURE TILES GRID -->
+  <div class="feature-tiles-grid">
+    
+    <!-- 1. Guard Reports -->
+    <a href="/#guard" class="feature-tile">
+      <div>
+        <div class="tile-top-row">
+          <div class="tile-icon-badge" style="background: #ecfdf5; color: #166534;">🛡️</div>
+          <span class="tile-badge alert-high badge-unseen-pulse" id="badge-unseen-guard">
+            <span id="tile-count-guard">{{ guard_today_count }}</span> New Today
+          </span>
+        </div>
+        <div class="tile-title-telugu">గార్డు నివేదికలు</div>
+        <div class="tile-title-english">Guard Reports</div>
+        <div class="tile-desc">Field complaints and incident alerts from on-ground ghat patrol guards.</div>
+      </div>
+      <div class="tile-footer">
+        <span>{{ guard_reports|length }} total reports logged</span>
+        <span class="tile-arrow">View &rarr;</span>
+      </div>
+    </a>
+
+    <!-- 2. Engineer Updates -->
+    <a href="/#field" class="feature-tile">
+      <div>
+        <div class="tile-top-row">
+          <div class="tile-icon-badge" style="background: #eff6ff; color: #1e40af;">👷</div>
+          <span class="tile-badge info">
+            <span id="tile-count-engineer">{{ eng_today_count }}</span> Updates Today
+          </span>
+        </div>
+        <div class="tile-title-telugu">ఇంజనీర్ నవీకరణలు</div>
+        <div class="tile-title-english">Engineer Updates</div>
+        <div class="tile-desc">Civil progress checks, milestone photos and site inspection updates.</div>
+      </div>
+      <div class="tile-footer">
+        <span>{{ engineer_updates|length }} milestone logs</span>
+        <span class="tile-arrow">View &rarr;</span>
+      </div>
+    </a>
+
+    <!-- 3. Works -->
+    <a href="/#works" class="feature-tile">
+      <div>
+        <div class="tile-top-row">
+          <div class="tile-icon-badge" style="background: #fff7ed; color: #c2410c;">🔨</div>
+          <span class="tile-badge alert-high">
+            <span id="tile-count-works">{{ summary.counts_by_status['delayed'] }}</span> Delayed
+          </span>
+        </div>
+        <div class="tile-title-telugu">సివిల్ పనులు</div>
+        <div class="tile-title-english">Works Packages</div>
+        <div class="tile-desc">{{ summary.total_works }} civil construction packages across 5 Godavari bathing ghats.</div>
+      </div>
+      <div class="tile-footer">
+        <span>Avg. Progress: {{ summary.avg_progress }}%</span>
+        <span class="tile-arrow">View &rarr;</span>
+      </div>
+    </a>
+
+    <!-- 4. Assets -->
+    <a href="/#assets" class="feature-tile">
+      <div>
+        <div class="tile-top-row">
+          <div class="tile-icon-badge" style="background: #f5f3ff; color: #6d28d9;">📦</div>
+          <span class="tile-badge alert-high">
+            <span id="tile-count-assets">{{ summary.assets.faulty }}</span> Faulty
+          </span>
+        </div>
+        <div class="tile-title-telugu">ఘాట్ ఆస్తులు</div>
+        <div class="tile-title-english">Assets Fleet</div>
+        <div class="tile-desc">{{ summary.assets.total }} bio-toilets, floodlights, CCTV cameras and power generators.</div>
+      </div>
+      <div class="tile-footer">
+        <span>{{ summary.assets.working }} Working</span>
+        <span class="tile-arrow">View &rarr;</span>
+      </div>
+    </a>
+
+    <!-- 5. Vendors -->
+    <a href="/#vendors" class="feature-tile">
+      <div>
+        <div class="tile-top-row">
+          <div class="tile-icon-badge" style="background: #f0fdf4; color: #15803d;">🤝</div>
+          <span class="tile-badge info">
+            Lowest: <span id="tile-count-vendors">{{ vendors[-1].score if vendors else 0 }}</span>/100
+          </span>
+        </div>
+        <div class="tile-title-telugu">కాంట్రాక్టర్లు</div>
+        <div class="tile-title-english">Vendors Scorecard</div>
+        <div class="tile-desc">Contractor performance rankings, on-time percentage &amp; penalties.</div>
+      </div>
+      <div class="tile-footer">
+        <span>{{ vendors|length }} active vendors</span>
+        <span class="tile-arrow">View &rarr;</span>
+      </div>
+    </a>
+
+    <!-- 6. Alerts Feed -->
+    <a href="/#alerts" class="feature-tile">
+      <div>
+        <div class="tile-top-row">
+          <div class="tile-icon-badge" style="background: #fef2f2; color: #b91c1c;">🚨</div>
+          <span class="tile-badge alert-high">
+            <span id="tile-count-alerts">{{ summary.open_alerts }}</span> Open
+          </span>
+        </div>
+        <div class="tile-title-telugu">హెచ్చరికలు</div>
+        <div class="tile-title-english">Alerts Feed</div>
+        <div class="tile-desc">Central combined stream of delays, equipment outages and guard calls.</div>
+      </div>
+      <div class="tile-footer">
+        <span>Combined Stream</span>
+        <span class="tile-arrow">View &rarr;</span>
+      </div>
+    </a>
+
+    <!-- 7. Readiness Report -->
+    <a href="/#report" class="feature-tile">
+      <div>
+        <div class="tile-top-row">
+          <div class="tile-icon-badge" style="background: #faf5ff; color: #7e22ce;">📄</div>
+          <span class="tile-badge success">Audit Ready</span>
+        </div>
+        <div class="tile-title-telugu">సంసిద్ధత నివేదిక</div>
+        <div class="tile-title-english">Readiness Report</div>
+        <div class="tile-desc">Executive summary, ghat completion breakdown, CSV exports and print sheet.</div>
+      </div>
+      <div class="tile-footer">
+        <span>Exportable CSV / PDF</span>
+        <span class="tile-arrow">View &rarr;</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- SLIM "NEEDS ATTENTION NOW" STRIP + MAP BUTTON -->
+  <div class="attention-strip">
+    <div class="attention-strip-title">
+      <span>🚨</span> Needs Attention Now:
+    </div>
+
+    <div class="attention-items-row">
+      {% for alert in top_alerts %}
+      <div class="attention-chip" onclick="openDetailDrawer({{ alert.id }})" title="Click to open case details">
+        <span class="badge badge-{{ alert.severity }}">{{ alert.severity }}</span>
+        <strong>{{ alert.type }}</strong>
+        <span style="color: var(--text-muted); font-size: 0.72rem;">{{ alert.created_at.strftime('%H:%M') }}</span>
+      </div>
+      {% else %}
+      <span style="color: var(--green); font-size: 0.84rem; font-weight: 700;">✓ All clear! No urgent alerts.</span>
+      {% endfor %}
+    </div>
+
+    <div>
+      <button class="btn btn-primary btn-sm" onclick="openMapModal()" style="font-weight: 700;">
+        🗺️ Open Spatial Map
+      </button>
+    </div>
+  </div>
+
+  <!-- Analytics Mini Dashboard -->
+  <div class="analytics-grid" style="display: grid; grid-template-columns: 1fr 1.2fr 1.2fr; gap: 20px; margin-bottom: 24px;">
+    <!-- Doughnut Chart -->
+    <div class="content-card" style="margin-bottom: 0;">
+      <div class="card-header-row">
+        <h3 class="card-title" style="font-size: 0.95rem;"><span>🍩</span> Status Distribution</h3>
+      </div>
+      <div style="position: relative; height: 210px; width: 100%;">
+        <canvas id="statusChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Bar Chart -->
+    <div class="content-card" style="margin-bottom: 0;">
+      <div class="card-header-row">
+        <h3 class="card-title" style="font-size: 0.95rem;"><span>📊</span> Avg. Progress per Ghat</h3>
+      </div>
+      <div style="position: relative; height: 210px; width: 100%;">
+        <canvas id="ghatChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Vendor Ranking Mini-Table -->
+    <div class="content-card" style="margin-bottom: 0;">
+      <div class="card-header-row">
+        <h3 class="card-title" style="font-size: 0.95rem;"><span>👷</span> Vendor Performance</h3>
+        <a href="/#vendors" class="btn btn-secondary btn-sm" style="font-size: 0.74rem;">Full &rarr;</a>
+      </div>
+      <div class="table-responsive" style="max-height: 210px; overflow-y: auto;">
+        <table class="data-table" style="font-size: 0.8rem;">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Vendor</th>
+              <th>Score</th>
+              <th>On-Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for v in vendors[:4] %}
+            <tr>
+              <td><strong>#{{ v.rank }}</strong></td>
+              <td>{{ v.name[:18] }}</td>
+              <td><span class="badge badge-{% if v.score >= 80 %}completed{% elif v.score >= 60 %}ontrack{% else %}delayed{% endif %}">{{ v.score }}/100</span></td>
+              <td>{{ v.on_time_pct }}%</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- =========================================================================
+     VIEW 2: GUARD REPORTS (#view-guard-reports) - ISOLATED
+     ========================================================================= -->
+<div id="view-guard-reports" class="hub-view">
+  <button class="hub-back-btn" onclick="window.location.hash='#home'">← Back to Home Hub</button>
+
+  <div class="inner-page-banner">
+    <div>
+      <div style="font-size: 0.78rem; font-weight: 700; color: #ffedd5; text-transform: uppercase;">ISOLATED MODULE</div>
+      <h1>🛡️ Guard Reports (గార్డు నివేదికలు)</h1>
+      <p style="font-size: 0.84rem; color: #cbd5e1; margin-top: 2px;">
+        Field incident reports and sanitation/safety calls submitted directly by on-ground guards.
+      </p>
+    </div>
+    <a href="/guard" target="_blank" class="btn btn-primary btn-sm" style="background: #16a34a; border-color: #16a34a;">
+      📱 Open /guard Mobile App &rarr;
+    </a>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="module-filter-bar">
+    <div class="filter-chips-group">
+      <button class="filter-chip-btn active" onclick="filterGuardReports('all', this)">All ({{ guard_reports|length }})</button>
+      <button class="filter-chip-btn" onclick="filterGuardReports('open', this)">Open Only</button>
+      <button class="filter-chip-btn" onclick="filterGuardReports('today', this)">Today Only</button>
+    </div>
+    <div style="font-size: 0.8rem; color: var(--text-muted);">
+      💡 Tap any row to view photo &amp; resolve
+    </div>
+  </div>
+
+  <!-- Guard Reports Table -->
+  <div class="content-card">
+    <div class="table-responsive">
+      <table class="data-table data-table-stacked" id="guard-reports-table">
+        <thead>
+          <tr>
+            <th style="width: 70px;">Photo</th>
+            <th>Issue / Description</th>
+            <th>Ghat</th>
+            <th>Reported By</th>
+            <th>Time</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for gr in guard_reports %}
+          <tr class="clickable-row guard-row" 
+              data-status="{{ gr.status }}" 
+              data-today="{{ 'true' if gr.created_at >= guard_reports[0].created_at else 'false' }}"
+              onclick="openDetailDrawer({{ gr.id }})">
+            
+            <td data-label="Photo">
+              {% if gr.photo_url %}
+              <img src="{{ gr.photo_url }}" class="thumb-56" alt="Guard report photo" onclick="event.stopPropagation(); zoomPhoto('{{ gr.photo_url }}')">
+              {% else %}
+              <div class="thumb-56">🛡️</div>
+              {% endif %}
+            </td>
+
+            <td data-label="Issue">
+              <strong style="color: var(--navy); display: block; font-size: 0.92rem;">{{ gr.clean_title }}</strong>
+              <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 2px;">
+                📍 {{ gr.clean_ghat }} &bull; 👤 {{ gr.clean_guard }}
+              </div>
+              {% if gr.note %}
+              <span style="font-size: 0.78rem; color: #475569; font-style: italic; display: block; margin-top: 3px;">
+                "{{ gr.note }}"
+              </span>
+              {% endif %}
+            </td>
+
+            <td data-label="Ghat">
+              📍 {{ gr.clean_ghat }}
+            </td>
+
+            <td data-label="Reported By">
+              👤 {{ gr.clean_guard }}
+            </td>
+
+            <td data-label="Time" style="font-size: 0.76rem; color: var(--text-muted);">
+              {{ gr.created_at.strftime('%d %b, %H:%M') }}
+            </td>
+
+            <td data-label="Status">
+              <span class="chip-status {{ gr.status }}" data-alert-row-status="{{ gr.id }}">
+                {{ gr.status.replace('_', ' ') }}
+              </span>
+            </td>
+
+            <td data-label="Action" onclick="event.stopPropagation()">
+              <button class="btn btn-secondary btn-sm" onclick="openDetailDrawer({{ gr.id }})" style="font-size: 0.74rem; padding: 4px 10px;">
+                👁️ View Detail
+              </button>
+            </td>
+
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 36px; color: var(--text-muted);">
+              No guard reports recorded. Open <strong>/guard</strong> to simulate an on-ground patrol report.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- =========================================================================
+     VIEW 3: ENGINEER UPDATES (#view-engineer-updates) - ISOLATED
+     ========================================================================= -->
+<div id="view-engineer-updates" class="hub-view">
+  <button class="hub-back-btn" onclick="window.location.hash='#home'">← Back to Home Hub</button>
+
+  <div class="inner-page-banner">
+    <div>
+      <div style="font-size: 0.78rem; font-weight: 700; color: #ffedd5; text-transform: uppercase;">ISOLATED MODULE</div>
+      <h1>👷 Engineer Updates (ఇంజనీర్ నవీకరణలు)</h1>
+      <p style="font-size: 0.84rem; color: #cbd5e1; margin-top: 2px;">
+        Site progress checks, photo milestones and field inspections submitted by executive engineers.
+      </p>
+    </div>
+    <a href="/field" target="_blank" class="btn btn-primary btn-sm">
+      📱 Open Engineer Update (/field) &rarr;
+    </a>
+  </div>
+
+  <div class="content-card">
+    <div class="table-responsive">
+      <table class="data-table data-table-stacked">
+        <thead>
+          <tr>
+            <th style="width: 70px;">Photo</th>
+            <th>Civil Package / Work</th>
+            <th>Ghat</th>
+            <th>Progress Milestone</th>
+            <th>Field Observation Note</th>
+            <th>Engineer</th>
+            <th>Date &amp; Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for up in engineer_updates %}
+          <tr class="clickable-row">
+            <td data-label="Photo">
+              {% if up.photo_url %}
+              <img src="{{ up.photo_url }}" class="thumb-56" alt="Progress Photo" onclick="zoomPhoto('{{ up.photo_url }}')">
+              {% else %}
+              <div class="thumb-56">🏗️</div>
+              {% endif %}
+            </td>
+
+            <td data-label="Package">
+              <strong style="color: var(--navy); font-size: 0.9rem;">{{ up.work.title }}</strong>
+              <div style="font-size: 0.74rem; color: var(--text-muted);">Package #{{ up.work_id }} &bull; {{ up.work.category }}</div>
+            </td>
+
+            <td data-label="Ghat">
+              📍 {{ up.work.ghat.name }}
+            </td>
+
+            <td data-label="Progress">
+              <span class="badge badge-completed" style="font-size: 0.84rem; font-weight: 800;">
+                {{ up.progress_pct }}%
+              </span>
+            </td>
+
+            <td data-label="Note" style="font-size: 0.84rem; color: var(--text-body); max-width: 320px;">
+              {{ up.note }}
+            </td>
+
+            <td data-label="Engineer" style="font-size: 0.78rem; font-weight: 700; color: #475569;">
+              👤 {{ up.updated_by }}
+            </td>
+
+            <td data-label="Timestamp" style="font-size: 0.74rem; color: var(--text-muted);">
+              {{ up.created_at.strftime('%d %b, %H:%M') }}
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 36px; color: var(--text-muted);">
+              No engineer updates logged yet. Use <strong>/field</strong> to transmit updates.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- =========================================================================
+     VIEW 4: WORKS (#view-works) - ISOLATED
+     ========================================================================= -->
+<div id="view-works" class="hub-view">
+  <button class="hub-back-btn" onclick="window.location.hash='#home'">← Back to Home Hub</button>
+
+  <div class="inner-page-banner">
+    <div>
+      <div style="font-size: 0.78rem; font-weight: 700; color: #ffedd5; text-transform: uppercase;">ISOLATED MODULE</div>
+      <h1>🔨 Civil Works Packages (సివిల్ పనులు)</h1>
+      <p style="font-size: 0.84rem; color: #cbd5e1; margin-top: 2px;">
+        Tracking all 30 civil construction, sanitation and infrastructure work packages across 5 bathing ghats.
+      </p>
+    </div>
+    <a href="/api/export/works.csv" class="btn btn-secondary btn-sm" style="color: white; border-color: rgba(255,255,255,0.3);">
+      📥 Export Works CSV
+    </a>
+  </div>
+
+  <div class="content-card">
+    <div class="table-responsive">
+      <table class="data-table data-table-stacked">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Package Title</th>
+            <th>Category</th>
+            <th>Ghat</th>
+            <th>Vendor</th>
+            <th>Progress</th>
+            <th>Status</th>
+            <th>Budget</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for w in works %}
+          <tr>
+            <td data-label="ID">#{{ w.id }}</td>
+            <td data-label="Title"><strong>{{ w.title }}</strong></td>
+            <td data-label="Category"><span class="badge" style="background: #f1f5f9; color: #334155;">{{ w.category }}</span></td>
+            <td data-label="Ghat">📍 {{ w.ghat.name }}</td>
+            <td data-label="Vendor">{{ w.vendor.name[:20] }}</td>
+            <td data-label="Progress">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div class="progress-bar-wrap" style="width: 80px; height: 8px;">
+                  <div class="progress-bar-fill {{ w.status.replace(' ', '') }}" style="width: {{ w.progress_pct }}%;"></div>
+                </div>
+                <span style="font-size: 0.78rem; font-weight: 700;">{{ w.progress_pct }}%</span>
+              </div>
+            </td>
+            <td data-label="Status">
+              <span class="badge badge-{{ w.status.replace(' ', '') }}">{{ w.status }}</span>
+            </td>
+            <td data-label="Budget" style="font-weight: 700;">
+              ₹{{ "{:,.0f}".format(w.budget) }}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- =========================================================================
+     VIEW 5: ASSETS (#view-assets) - ISOLATED
+     ========================================================================= -->
+<div id="view-assets" class="hub-view">
+  <button class="hub-back-btn" onclick="window.location.hash='#home'">← Back to Home Hub</button>
+
+  <div class="inner-page-banner">
+    <div>
+      <div style="font-size: 0.78rem; font-weight: 700; color: #ffedd5; text-transform: uppercase;">ISOLATED MODULE</div>
+      <h1>📦 Assets Fleet Management (ఘాట్ ఆస్తులు)</h1>
+      <p style="font-size: 0.84rem; color: #cbd5e1; margin-top: 2px;">
+        Real-time condition monitoring of mobile bio-toilets, high-mast floodlights, CCTV cameras, and generators.
+      </p>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <div class="table-responsive">
+      <table class="data-table data-table-stacked">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Asset Name</th>
+            <th>Type</th>
+            <th>Ghat</th>
+            <th>Condition</th>
+            <th>Quick Toggle Condition</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in assets %}
+          <tr>
+            <td data-label="ID">#{{ a.id }}</td>
+            <td data-label="Asset Name"><strong>{{ a.name }}</strong></td>
+            <td data-label="Type"><span class="badge" style="background: #f3e8ff; color: #6b21a8;">{{ a.type }}</span></td>
+            <td data-label="Ghat">📍 {{ a.ghat.name }}</td>
+            <td data-label="Condition">
+              <span class="badge badge-{% if a.status == 'working' %}completed{% elif a.status == 'faulty' %}delayed{% else %}ontrack{% endif %}">
+                {{ a.status.upper() }}
+              </span>
+            </td>
+            <td data-label="Toggle">
+              <select class="form-select" style="font-size: 0.78rem; padding: 4px 8px; width: auto;" onchange="changeAssetStatus({{ a.id }}, this.value)">
+                <option value="working" {% if a.status == 'working' %}selected{% endif %}>Working</option>
+                <option value="faulty" {% if a.status == 'faulty' %}selected{% endif %}>Faulty</option>
+                <option value="under maintenance" {% if a.status == 'under maintenance' %}selected{% endif %}>Under Maintenance</option>
+              </select>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- =========================================================================
+     VIEW 6: VENDORS (#view-vendors) - ISOLATED
+     ========================================================================= -->
+<div id="view-vendors" class="hub-view">
+  <button class="hub-back-btn" onclick="window.location.hash='#home'">← Back to Home Hub</button>
+
+  <div class="inner-page-banner">
+    <div>
+      <div style="font-size: 0.78rem; font-weight: 700; color: #ffedd5; text-transform: uppercase;">ISOLATED MODULE</div>
+      <h1>🤝 Vendor Performance Scorecard (కాంట్రాక్టర్లు)</h1>
+      <p style="font-size: 0.84rem; color: #cbd5e1; margin-top: 2px;">
+        Weighted score algorithm: 50% On-Time Completion + 30% Quality Rating + 20% Alert Penalties.
+      </p>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <div class="table-responsive">
+      <table class="data-table data-table-stacked">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Contractor Firm</th>
+            <th>Contact Person</th>
+            <th>Composite Score</th>
+            <th>On-Time %</th>
+            <th>Quality (out of 5)</th>
+            <th>Staff Deployed</th>
+            <th>Open Alerts</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for v in vendors %}
+          <tr style="{% if v.rank <= 3 %}background: #f0fdf4;{% elif v.score < 60 %}background: #fef2f2;{% endif %}">
+            <td data-label="Rank"><strong style="font-size: 1.05rem;">#{{ v.rank }}</strong></td>
+            <td data-label="Firm"><strong>{{ v.name }}</strong></td>
+            <td data-label="Contact">{{ v.contact_person }}</td>
+            <td data-label="Score">
+              <span class="badge badge-{% if v.score >= 80 %}completed{% elif v.score >= 60 %}ontrack{% else %}delayed{% endif %}" style="font-size: 0.85rem; font-weight: 800;">
+                {{ v.score }} / 100
+              </span>
+            </td>
+            <td data-label="On-Time">{{ v.on_time_pct }}%</td>
+            <td data-label="Quality">⭐ {{ v.quality_rating }}</td>
+            <td data-label="Staff">👷 {{ v.staff_deployed }} workers</td>
+            <td data-label="Alerts">
+              <span style="font-weight: 800; color: {% if v.open_alerts_count > 0 %}var(--red){% else %}var(--green){% endif %};">
+                {{ v.open_alerts_count }}
+              </span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- =========================================================================
+     VIEW 7: ALERTS FEED (#view-alerts) - COMBINED STREAM
+     ========================================================================= -->
+<div id="view-alerts" class="hub-view">
+  <button class="hub-back-btn" onclick="window.location.hash='#home'">← Back to Home Hub</button>
+
+  <div class="inner-page-banner">
+    <div>
+      <div style="font-size: 0.78rem; font-weight: 700; color: #ffedd5; text-transform: uppercase;">COMBINED STREAM</div>
+      <h1>🚨 Central Alerts Feed (హెచ్చరికలు)</h1>
+      <p style="font-size: 0.84rem; color: #cbd5e1; margin-top: 2px;">
+        Unified stream of delayed work packages, faulty assets, vendor penalties and guard incident reports.
+      </p>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <div class="table-responsive">
+      <table class="data-table data-table-stacked">
+        <thead>
+          <tr>
+            <th>Priority</th>
+            <th>Type</th>
+            <th>Message</th>
+            <th>Time</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in alerts %}
+          <tr class="clickable-row" onclick="openDetailDrawer({{ a.id }})">
+            <td data-label="Priority">
+              <span class="badge badge-{{ a.severity }}">{{ a.severity.upper() }}</span>
+            </td>
+            <td data-label="Type"><strong>{{ a.type }}</strong></td>
+            <td data-label="Message" style="max-width: 380px;">{{ a.clean_message }}</td>
+            <td data-label="Time" style="font-size: 0.76rem; color: var(--text-muted);">
+              {{ a.created_at.strftime('%d %b, %H:%M') }}
+            </td>
+            <td data-label="Status">
+              <span class="chip-status {{ a.status }}" data-alert-row-status="{{ a.id }}">
+                {{ a.status.replace('_', ' ') }}
+              </span>
+            </td>
+            <td data-label="Action" onclick="event.stopPropagation()">
+              <button class="btn btn-secondary btn-sm" onclick="openDetailDrawer({{ a.id }})" style="font-size: 0.74rem; padding: 4px 8px;">
+                Detail &rarr;
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- =========================================================================
+     VIEW 8: READINESS REPORT (#view-report) - EXECUTIVE SUMMARY
+     ========================================================================= -->
+<div id="view-report" class="hub-view">
+  <button class="hub-back-btn" onclick="window.location.hash='#home'">← Back to Home Hub</button>
+
+  <div class="inner-page-banner">
+    <div>
+      <div style="font-size: 0.78rem; font-weight: 700; color: #ffedd5; text-transform: uppercase;">EXECUTIVE AUDIT</div>
+      <h1>📄 GhatMitra Readiness Report (సంసిద్ధత నివేదిక)</h1>
+      <p style="font-size: 0.84rem; color: #cbd5e1; margin-top: 2px;">
+        Official Godavari Pushkaralu 2027 infrastructure readiness audit. Print-ready and exportable.
+      </p>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <button class="btn btn-secondary btn-sm" onclick="window.print()" style="color: white; border-color: rgba(255,255,255,0.4);">
+        🖨️ Print / Save PDF
+      </button>
+      <a href="/api/export/works.csv" class="btn btn-primary btn-sm">
+        📥 Works CSV
+      </a>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <h2 style="font-size: 1.15rem; font-weight: 800; color: var(--navy); margin-bottom: 12px;">Executive Overview</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 24px;">
+      <div style="background: #f8fafc; padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+        <div style="font-size: 0.76rem; color: var(--text-muted); font-weight: 700;">TOTAL PACKAGES</div>
+        <div style="font-size: 1.6rem; font-weight: 900; color: var(--blue);">{{ summary.total_works }}</div>
+      </div>
+      <div style="background: #f8fafc; padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+        <div style="font-size: 0.76rem; color: var(--text-muted); font-weight: 700;">COMPLETED WORKS</div>
+        <div style="font-size: 1.6rem; font-weight: 900; color: var(--green);">{{ summary.counts_by_status['completed'] }}</div>
+      </div>
+      <div style="background: #f8fafc; padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+        <div style="font-size: 0.76rem; color: var(--text-muted); font-weight: 700;">DELAYED WORKS</div>
+        <div style="font-size: 1.6rem; font-weight: 900; color: var(--red);">{{ summary.counts_by_status['delayed'] }}</div>
+      </div>
+      <div style="background: #f8fafc; padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+        <div style="font-size: 0.76rem; color: var(--text-muted); font-weight: 700;">BUDGET AT RISK</div>
+        <div style="font-size: 1.6rem; font-weight: 900; color: #b91c1c;">₹{{ "{:,.0f}".format(summary.budget.delayed_budget) }}</div>
+      </div>
+    </div>
+
+    <h3 style="font-size: 1rem; font-weight: 800; color: var(--navy); margin-bottom: 12px;">Ghat-Wise Physical Completion</h3>
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      {% for ghat_name, p in summary.ghat_progress.items() %}
+      <div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.86rem; font-weight: 700; margin-bottom: 4px;">
+          <span>📍 {{ ghat_name }}</span>
+          <span>{{ p }}%</span>
+        </div>
+        <div class="progress-bar-wrap" style="height: 10px;">
+          <div class="progress-bar-fill {% if p >= 70 %}completed{% elif p >= 40 %}ontrack{% else %}delayed{% endif %}" style="width: {{ p }}%;"></div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+
+<!-- =========================================================================
+     DETAIL DRAWER (SLIDES IN FROM RIGHT)
+     ========================================================================= -->
+<div id="detail-drawer-backdrop" class="detail-drawer-backdrop" onclick="closeDetailDrawer()"></div>
+<div id="detail-drawer" class="detail-drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+  <div class="drawer-header">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span style="font-size: 1.2rem;">📋</span>
+      <h3 id="drawer-title" style="margin: 0; font-size: 1.05rem; font-weight: 800; color: white;">Incident Report Detail</h3>
+    </div>
+    <button onclick="closeDetailDrawer()" style="background: none; border: none; color: white; font-size: 1.6rem; cursor: pointer; line-height: 1;">&times;</button>
+  </div>
+  <div class="drawer-body" id="drawer-body-content">
+    <!-- Populated by main.js via openDetailDrawer -->
+  </div>
+</div>
+
+
+<!-- =========================================================================
+     PHOTO ZOOM MODAL
+     ========================================================================= -->
+<div id="photo-zoom-modal" class="photo-zoom-modal" onclick="closePhotoZoom()">
+  <img id="photo-zoom-img" class="photo-zoom-img" alt="Zoomed preview">
+</div>
+
+
+<!-- =========================================================================
+     SPATIAL MAP MODAL
+     ========================================================================= -->
+<div id="map-modal" class="map-modal" onclick="if (event.target === this) closeMapModal();">
+  <div class="map-modal-card">
+    <div style="background: var(--navy); color: white; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 1.2rem;">🗺️</span>
+        <strong style="font-size: 1.05rem;">Spatial Work &amp; Asset Grid &bull; Rajamahendravaram</strong>
+      </div>
+      <button onclick="closeMapModal()" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
+    </div>
+    <div style="padding: 14px;">
+      <div id="hub-map"></div>
+      <div style="display: flex; gap: 14px; font-size: 0.76rem; font-weight: 700; padding: 8px 10px; background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-sm); margin-top: 10px;">
+        <span><span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--red);"></span> Delayed Work</span>
+        <span><span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--amber);"></span> On Track</span>
+        <span><span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--green);"></span> Completed</span>
+        <span><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#dc2626;"></span> Faulty Asset</span>
+        <span><span style="display:inline-block; width:9px; height:9px; border-radius:2px; background:#8b5cf6;"></span> Working Asset</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Filter guard reports by chip
+  function filterGuardReports(filter, btn) {
+    document.querySelectorAll('.filter-chip-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const rows = document.querySelectorAll('.guard-row');
+    rows.forEach(r => {
+      if (filter === 'all') {
+        r.style.display = '';
+      } else if (filter === 'open') {
+        r.style.display = r.getAttribute('data-status') === 'open' ? '' : 'none';
+      } else if (filter === 'today') {
+        r.style.display = r.getAttribute('data-today') === 'true' ? '' : 'none';
+      }
+    });
+  }
+
+  // Quick asset status change
+  async function changeAssetStatus(assetId, newStatus) {
+    try {
+      const res = await fetch(`/api/assets/${assetId}/status?status=${encodeURIComponent(newStatus)}`, {
+        method: 'POST'
+      });
+      if (res.ok) {
+        showToast(`Asset #${assetId} marked as ${newStatus}`, 'success');
+        fetchHubCounts();
+      } else {
+        showToast("Error updating asset", 'error');
+      }
+    } catch (e) {
+      showToast("Network error", 'error');
+    }
+  }
+
+  // Map & Chart Initialization
+  document.addEventListener('DOMContentLoaded', () => {
+    // 1. Leaflet Map
+    const map = L.map('hub-map').setView([17.0015, 81.7770], 14);
+    window.hubMap = map;
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '&copy; OpenStreetMap | GhatMitra'
+    }).addTo(map);
+
+    const bounds = [];
+
+    // Works Layer
+    const worksCluster = L.markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 40 });
+    const worksData = [
+      {% for w in works %}
+      {
+        id: {{ w.id }},
+        title: {{ w.title | tojson }},
+        category: {{ w.category | tojson }},
+        status: {{ w.status | tojson }},
+        progress: {{ w.progress_pct }},
+        ghat: {{ w.ghat.name | tojson }},
+        vendor: {{ w.vendor.name | tojson }},
+        budget: {{ w.budget }},
+        lat: {{ w.latitude }},
+        lng: {{ w.longitude }}
+      },
+      {% endfor %}
+    ];
+
+    const statusColors = {
+      'completed': '#16a34a',
+      'on track': '#f59e0b',
+      'delayed': '#dc2626',
+      'not started': '#94a3b8'
+    };
+
+    worksData.forEach(w => {
+      bounds.push([w.lat, w.lng]);
+      const color = statusColors[w.status] || '#94a3b8';
+      const isDelayed = w.status === 'delayed';
+
+      const icon = L.divIcon({
+        className: 'custom-map-icon',
+        html: `<div style="background-color: ${color}; width: 14px; height: 14px; border-radius: 50%; border: 2px solid #ffffff; box-shadow: 0 1px 4px rgba(0,0,0,0.3); ${isDelayed ? 'box-shadow: 0 0 0 3px rgba(220,38,38,0.5);' : ''}"></div>`,
+        iconSize: [14, 14],
+        iconAnchor: [7, 7]
+      });
+
+      const marker = L.marker([w.lat, w.lng], { icon: icon });
+      marker.bindPopup(`
+        <div style="font-family: var(--font-family); min-width: 200px;">
+          <span class="badge badge-${w.status.replace(' ', '')}">${w.status.toUpperCase()}</span>
+          <h4 style="margin: 6px 0 2px; font-size: 0.95rem; color: var(--navy);">${w.title}</h4>
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px;">📍 ${w.ghat}</div>
+          <div style="font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Progress: ${w.progress}%</div>
+          <div style="font-size: 0.78rem; color: var(--text-muted);">Budget: ₹${Number(w.budget).toLocaleString()}</div>
+        </div>
+      `);
+      worksCluster.addLayer(marker);
+    });
+
+    map.addLayer(worksCluster);
+
+    // Assets Layer
+    const assetsData = [
+      {% for a in assets %}
+      {
+        id: {{ a.id }},
+        name: {{ a.name | tojson }},
+        type: {{ a.type | tojson }},
+        status: {{ a.status | tojson }},
+        ghat: {{ a.ghat.name | tojson }},
+        lat: {{ a.ghat.latitude }} + (Math.random() - 0.5) * 0.003,
+        lng: {{ a.ghat.longitude }} + (Math.random() - 0.5) * 0.003
+      },
+      {% endfor %}
+    ];
+
+    const assetCluster = L.markerClusterGroup({ maxClusterRadius: 30 });
+    assetsData.forEach(a => {
+      const isFaulty = a.status === 'faulty';
+      const color = isFaulty ? '#dc2626' : (a.status === 'working' ? '#16a34a' : '#f59e0b');
+      const icon = L.divIcon({
+        className: 'custom-asset-icon',
+        html: `<div style="background-color: ${color}; width: 11px; height: 11px; border-radius: 2px; border: 1.5px solid #ffffff;"></div>`,
+        iconSize: [11, 11],
+        iconAnchor: [5, 5]
+      });
+
+      const marker = L.marker([a.lat, a.lng], { icon: icon });
+      marker.bindPopup(`
+        <div style="font-family: var(--font-family); min-width: 170px;">
+          <strong style="color: var(--navy); font-size: 0.88rem;">${a.name}</strong>
+          <div style="font-size: 0.76rem; color: var(--text-muted); margin: 3px 0;">📍 ${a.ghat} &bull; ${a.type}</div>
+          <span class="badge badge-${a.status === 'faulty' ? 'delayed' : 'completed'}">${a.status.toUpperCase()}</span>
+        </div>
+      `);
+      assetCluster.addLayer(marker);
+    });
+
+    map.addLayer(assetCluster);
+
+    if (bounds.length > 0) {
+      map.fitBounds(bounds, { padding: [20, 20], maxZoom: 15 });
+    }
+
+    // 2. Charts
+    const statusCtx = document.getElementById('statusChart');
+    if (statusCtx) {
+      new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Completed', 'On Track', 'Delayed', 'Not Started'],
+          datasets: [{
+            data: [
+              {{ summary.counts_by_status["completed"] }},
+              {{ summary.counts_by_status["on track"] }},
+              {{ summary.counts_by_status["delayed"] }},
+              {{ summary.counts_by_status["not started"] }}
+            ],
+            backgroundColor: ['#16a34a', '#f59e0b', '#dc2626', '#94a3b8'],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } }
+          },
+          cutout: '68%'
+        }
+      });
+    }
+
+    const ghatCtx = document.getElementById('ghatChart');
+    if (ghatCtx) {
+      const ghatLabels = {{ summary.ghat_progress.keys() | list | tojson }};
+      const ghatVals = {{ summary.ghat_progress.values() | list | tojson }};
+
+      new Chart(ghatCtx, {
+        type: 'bar',
+        data: {
+          labels: ghatLabels,
+          datasets: [{
+            label: 'Avg. Progress %',
+            data: ghatVals,
+            backgroundColor: '#ea580c',
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { min: 0, max: 100, ticks: { callback: v => v + '%' } },
+            x: { ticks: { font: { size: 9 } } }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}

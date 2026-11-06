@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 80" fill="none">
+  <!-- Glowing Radiance Filter -->
+  <defs>
+    <radialGradient id="diyaGlow" cx="50%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.9" />
+      <stop offset="50%" stop-color="#ea580c" stop-opacity="0.5" />
+      <stop offset="100%" stop-color="#ea580c" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Ambient Glow Behind Flame -->
+  <circle cx="50" cy="30" r="28" fill="url(#diyaGlow)" />
+
+  <!-- Diya Terracotta Clay Bowl -->
+  <path d="M22 48 C 24 64, 76 64, 78 48 C 82 45, 60 44, 50 44 C 40 44, 18 45, 22 48 Z" fill="#b45309" stroke="#78350f" stroke-width="1.5" />
+  <ellipse cx="50" cy="46" rx="26" ry="6" fill="#d97706" />
+
+  <!-- Diya Flame -->
+  <path d="M50 16 C 54 26, 58 32, 55 38 C 53 42, 47 42, 45 38 C 42 32, 46 26, 50 16 Z" fill="#fef08a" />
+  <path d="M50 22 C 52 28, 55 32, 53 36 C 52 38, 48 38, 47 36 C 45 32, 48 28, 50 22 Z" fill="#ffffff" />
+
+  <!-- Water Ripples below Diya -->
+  <ellipse cx="50" cy="62" rx="28" ry="4" fill="none" stroke="rgba(255, 237, 213, 0.4)" stroke-width="1.2" />
+  <ellipse cx="50" cy="67" rx="18" ry="2.5" fill="none" stroke="rgba(255, 237, 213, 0.25)" stroke-width="1" />
+</svg>

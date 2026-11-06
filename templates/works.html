@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Works Directory | GhatMitra (ఘాట్ మిత్ర){% endblock %}
+
+{% block content %}
+<div>
+  <!-- Thin Kolam Banner Header -->
+  <div class="inner-page-banner">
+    <div>
+      <h2>
+        <span>🔨</span> Pushkaralu Works &amp; Infrastructure Projects ({{ works|length }})
+      </h2>
+      <p>
+        Tracks civil steps, modular sanitation, flood lighting, barricades, parking, and water points across 5 bathing ghats.
+      </p>
+    </div>
+    <div style="font-size: 0.8rem; color: #cbd5e1; font-weight: 600;">
+      Target: 26 June 2027
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <form method="get" action="/works" class="filter-bar">
+    <div>
+      <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 2px;">Status:</label>
+      <select name="status" class="form-select" onchange="this.form.submit()">
+        <option value="">All Statuses</option>
+        <option value="delayed" {% if selected_status == 'delayed' %}selected{% endif %}>Delayed (30%)</option>
+        <option value="on track" {% if selected_status == 'on track' %}selected{% endif %}>On Track</option>
+        <option value="completed" {% if selected_status == 'completed' %}selected{% endif %}>Completed</option>
+        <option value="not started" {% if selected_status == 'not started' %}selected{% endif %}>Not Started</option>
+      </select>
+    </div>
+
+    <div>
+      <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 2px;">Category:</label>
+      <select name="category" class="form-select" onchange="this.form.submit()">
+        <option value="">All Categories</option>
+        {% for cat in categories %}
+        <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat | title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div>
+      <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 2px;">Ghat:</label>
+      <select name="ghat_id" class="form-select" onchange="this.form.submit()">
+        <option value="">All Ghats</option>
+        {% for g in ghats %}
+        <option value="{{ g.id }}" {% if selected_ghat == g.id %}selected{% endif %}>{{ g.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div>
+      <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 2px;">Vendor:</label>
+      <select name="vendor_id" class="form-select" onchange="this.form.submit()">
+        <option value="">All Vendors</option>
+        {% for v in vendors %}
+        <option value="{{ v.id }}" {% if selected_vendor == v.id %}selected{% endif %}>{{ v.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div style="margin-top: 18px;">
+      <a href="/works" class="btn btn-secondary btn-sm">Reset Filters</a>
+    </div>
+  </form>
+
+  <!-- Works Table -->
+  <div class="content-card" style="padding: 0; overflow: hidden;">
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Work Title</th>
+            <th>Category</th>
+            <th>Ghat</th>
+            <th>Vendor</th>
+            <th>Budget (INR)</th>
+            <th style="min-width: 140px;">Progress</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for w in works %}
+          <tr>
+            <td><strong>#{{ w.id }}</strong></td>
+            <td>
+              <a href="/works/{{ w.id }}" style="font-weight: 700; color: #0f172a; text-decoration: none;">
+                {{ w.title }}
+              </a>
+              <div style="font-size: 0.75rem; color: #64748b;">
+                Target: {{ w.planned_start.strftime('%d %b') }} &rarr; {{ w.planned_end.strftime('%d %b, %Y') }}
+              </div>
+            </td>
+            <td>
+              <span class="cat-badge-wrap" style="font-size: 0.8rem; font-weight: 600; background: #e0f2fe; color: #0369a1; padding: 3px 8px; border-radius: 6px;">
+                {% if w.category == 'ghat steps' %}
+                <img src="/static/img/ghat_steps.svg" class="cat-icon" alt="Ghat Steps">
+                {% elif w.category == 'toilet' %}
+                <img src="/static/img/toilet_block.svg" class="cat-icon" alt="Toilet">
+                {% elif w.category == 'lighting' %}
+                <img src="/static/img/solar_light.svg" class="cat-icon" alt="Lighting">
+                {% elif w.category == 'barricade' %}
+                <img src="/static/img/barricade.svg" class="cat-icon" alt="Barricade">
+                {% endif %}
+                {{ w.category | title }}
+              </span>
+            </td>
+            <td>{{ w.ghat.name }}</td>
+            <td style="font-size: 0.82rem; font-weight: 600;">{{ w.vendor.name }}</td>
+            <td style="font-weight: 700; color: #1e293b;">
+              ₹{{ "{:,.0f}".format(w.budget) }}
+            </td>
+            <td>
+              <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700;">
+                <span>{{ w.progress_pct }}%</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: {{ w.progress_pct }}%; background: {% if w.status == 'delayed' %}#ef4444{% elif w.status == 'completed' %}#10b981{% else %}#f59e0b{% endif %};"></div>
+              </div>
+            </td>
+            <td>
+              <span class="badge {% if w.status == 'delayed' %}badge-delayed{% elif w.status == 'completed' %}badge-completed{% elif w.status == 'on track' %}badge-ontrack{% else %}badge-notstarted{% endif %}">
+                {{ w.status }}
+              </span>
+            </td>
+            <td>
+              <div style="display: flex; gap: 6px;">
+                <button class="btn btn-secondary btn-sm" onclick="openUpdateModal({{ w.id }}, '{{ w.title | escape }}', {{ w.progress_pct }})">
+                  Update
+                </button>
+                <a href="/works/{{ w.id }}" class="btn btn-primary btn-sm">
+                  View
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Update Work Progress -->
+<div id="update-modal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700;">Log Field Work Update</h3>
+      <button onclick="closeUpdateModal()" style="background: none; border: none; color: white; font-size: 1.4rem; cursor: pointer;">&times;</button>
+    </div>
+    <form class="modal-body" onsubmit="submitWorkUpdate(event)">
+      <input type="hidden" id="modal-work-id">
+      
+      <div style="margin-bottom: 14px;">
+        <label style="font-size: 0.82rem; font-weight: 700; color: #64748b;">Work Package:</label>
+        <div id="modal-work-title" style="font-weight: 800; color: #0f172a; font-size: 1rem;"></div>
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+          <label style="font-size: 0.82rem; font-weight: 700; color: #334155;">Work Progress Percentage:</label>
+          <span id="modal-progress-val" style="font-weight: 800; color: #ea580c; font-size: 1.1rem;">50%</span>
+        </div>
+        <input type="range" id="modal-progress" min="0" max="100" class="form-input" style="width: 100%;" oninput="document.getElementById('modal-progress-val').innerText = this.value + '%'">
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <label style="font-size: 0.82rem; font-weight: 700; color: #334155; display: block; margin-bottom: 4px;">Field Inspection Note: *</label>
+        <textarea id="modal-note" class="form-input" style="width: 100%; height: 80px;" placeholder="Describe on-ground progress, material delivery, testing, or bottlenecks..." required></textarea>
+      </div>
+
+      <div style="margin-bottom: 18px;">
+        <label style="font-size: 0.82rem; font-weight: 700; color: #334155; display: block; margin-bottom: 4px;">Inspecting Engineer / Officer: *</label>
+        <input type="text" id="modal-updated-by" class="form-input" style="width: 100%;" value="Er. M. Rao (Executive Engineer)" required>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 8px;">
+        <button type="button" class="btn btn-secondary" onclick="closeUpdateModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Work Update</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+

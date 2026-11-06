@@ -1,0 +1,534 @@
+{% extends "base.html" %}
+
+{% block title %}Engineer Update | GhatMitra (ఘాట్ మిత్ర){% endblock %}
+
+{% block head_extra %}
+<style>
+  .field-container {
+    max-width: 580px;
+    margin: 0 auto;
+    padding: 10px 4px;
+  }
+  .sync-badge-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 16px;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow-sm);
+  }
+  .sync-pulse {
+    width: 10px;
+    height: 10px;
+    background: var(--green);
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7);
+    animation: pulseSync 2s infinite;
+  }
+  @keyframes pulseSync {
+    0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); }
+    70% { box-shadow: 0 0 0 6px rgba(22, 163, 74, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+  }
+  .mobile-tabs {
+    display: flex;
+    background: #e2e8f0;
+    border-radius: var(--radius-sm);
+    padding: 4px;
+    margin-bottom: 20px;
+    gap: 4px;
+  }
+  .mobile-tab-btn {
+    flex: 1;
+    padding: 12px 14px;
+    font-size: 0.92rem;
+    font-weight: 700;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: center;
+  }
+  .mobile-tab-btn.active {
+    background: #ffffff;
+    color: var(--navy);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  }
+  .field-card {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
+  }
+  .touch-slider-box {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    margin: 12px 0 20px;
+    text-align: center;
+  }
+  .range-slider {
+    width: 100%;
+    height: 12px;
+    accent-color: var(--saffron);
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  .photo-upload-zone {
+    border: 2px dashed #cbd5e1;
+    border-radius: var(--radius-sm);
+    padding: 20px;
+    text-align: center;
+    background: #f8fafc;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+    margin-bottom: 20px;
+  }
+  .photo-upload-zone:hover {
+    border-color: var(--saffron);
+    background: #fff7ed;
+  }
+  .photo-preview {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: var(--radius-sm);
+    margin-top: 12px;
+    display: none;
+    object-fit: cover;
+  }
+  .feedback-box {
+    display: none;
+    background: #ecfdf5;
+    border-left: 4px solid var(--green);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    margin-bottom: 20px;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="field-container">
+
+  <!-- Header Info Strip -->
+  <div class="sync-badge-box">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span class="sync-pulse"></span>
+      <span style="font-size: 0.82rem; font-weight: 700; color: var(--navy);">Central Database Connected</span>
+    </div>
+    <span class="badge" style="background: #e2e8f0; color: #475569; font-size: 0.72rem;">
+      Offline Queue: Ready
+    </span>
+  </div>
+
+  <!-- Dynamic Change Feedback Box with "View in Engineer Updates" Link -->
+  <div id="feedback-container" class="feedback-box">
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+      <span style="font-size: 1.2rem; color: var(--green);">✓</span>
+      <strong id="feedback-title" style="color: var(--green-text); font-size: 0.95rem;">Update Transmitted to Control Room</strong>
+    </div>
+    <p id="feedback-message" style="font-size: 0.85rem; color: #166534; margin: 0; line-height: 1.45;">
+      Progress recalculated. Central alerts and risk indicators updated.
+    </p>
+    <div id="feedback-action-links" style="margin-top: 12px;">
+      <a href="/#field" class="btn btn-primary btn-sm" style="font-size: 0.8rem; padding: 6px 14px;">
+        👁️ View in Engineer Updates &rarr;
+      </a>
+      <a href="/#alerts" class="btn btn-secondary btn-sm" style="font-size: 0.8rem; padding: 6px 12px; margin-left: 6px;">
+        🚨 View Alerts Feed &rarr;
+      </a>
+    </div>
+  </div>
+
+  <!-- Segmented Tabs -->
+  <div class="mobile-tabs">
+    <button class="mobile-tab-btn active" id="tab-btn-works" onclick="switchFieldTab('works')">
+      🔨 Update Work Progress
+    </button>
+    <button class="mobile-tab-btn" id="tab-btn-assets" onclick="switchFieldTab('assets')">
+      🚨 Report Asset Fault
+    </button>
+  </div>
+
+  <!-- TAB 1: WORK PROGRESS FORM -->
+  <div id="tab-panel-works" class="field-card">
+    <div style="margin-bottom: 16px;">
+      <h2 style="font-size: 1.2rem; font-weight: 800; color: var(--navy); margin-bottom: 4px;">
+        Field Work Milestone Check
+      </h2>
+      <p style="font-size: 0.82rem; color: var(--text-muted);">
+        Submit real-time ground status and photo milestones. Recalculates delays and vendor score automatically.
+      </p>
+    </div>
+
+    <form id="field-work-form" onsubmit="handleFieldWorkSubmit(event)">
+      <!-- Work Selection -->
+      <div class="form-group">
+        <label class="form-label" for="field-select-work">Select Civil Work Package *</label>
+        <select id="field-select-work" class="form-select" required onchange="handleWorkSelectChange(this)">
+          <option value="">-- Choose Work Package (30 total) --</option>
+          {% for w in works %}
+          <option value="{{ w.id }}" data-progress="{{ w.progress_pct }}" data-status="{{ w.status }}">
+            #{{ w.id }} &bull; {{ w.title }} ({{ w.ghat.name }}) [Current: {{ w.progress_pct }}%]
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Touch Slider -->
+      <div class="touch-slider-box">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">
+            Reported Physical Completion
+          </span>
+          <span id="slider-val-display" style="font-size: 1.8rem; font-weight: 900; color: var(--saffron);">
+            50%
+          </span>
+        </div>
+        <input type="range" id="field-slider-progress" min="0" max="100" value="50" class="range-slider" oninput="updateSliderDisplay(this.value)">
+        <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #94a3b8; margin-top: 4px;">
+          <span>0% Not Started</span>
+          <span>50% Mid-point</span>
+          <span>100% Certified Complete</span>
+        </div>
+      </div>
+
+      <!-- Inspection Note -->
+      <div class="form-group">
+        <label class="form-label" for="field-input-note">Field Inspection Note &bull; Ground Observations *</label>
+        <textarea id="field-input-note" class="form-input" rows="3" required placeholder="Detail ground situation, e.g., reinforcement bar laying complete, awaiting concrete mixer..."></textarea>
+      </div>
+
+      <!-- Photo Upload with Preview -->
+      <div class="form-group">
+        <label class="form-label">Site Photo (Optional)</label>
+        <div class="photo-upload-zone" onclick="document.getElementById('field-photo-file').click()">
+          <div style="font-size: 1.8rem; margin-bottom: 4px;">📸</div>
+          <div style="font-size: 0.88rem; font-weight: 700; color: var(--navy);">Tap to Snap or Upload Site Photo</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">Compressed and uploaded to central storage</div>
+          <input type="file" id="field-photo-file" accept="image/*" capture="environment" style="display: none;" onchange="previewWorkPhoto(event)">
+          <img id="photo-preview-img" class="photo-preview" alt="Site inspection preview">
+        </div>
+      </div>
+
+      <!-- Officer Identification -->
+      <div class="form-group">
+        <label class="form-label" for="field-officer-name">Inspecting Officer / Engineer *</label>
+        <input type="text" id="field-officer-name" class="form-input" required value="Er. S. Rao (Site QC)">
+      </div>
+
+      <!-- Big Primary Touch Target -->
+      <button type="submit" id="btn-submit-work" class="btn btn-primary btn-lg btn-block" style="padding: 16px;">
+        🚀 Transmit Work Update to Control Room
+      </button>
+    </form>
+  </div>
+
+  <!-- TAB 2: REPORT ASSET FAULT -->
+  <div id="tab-panel-assets" class="field-card" style="display: none;">
+    <div style="margin-bottom: 16px;">
+      <h2 style="font-size: 1.2rem; font-weight: 800; color: var(--red-text); margin-bottom: 4px;">
+        🚨 Report Asset Fault / Outage
+      </h2>
+      <p style="font-size: 0.82rem; color: var(--text-muted);">
+        Immediate equipment fault reporting for bio-toilets, CCTV, floodlights, and generators.
+      </p>
+    </div>
+
+    <form id="field-asset-form" onsubmit="handleFieldAssetSubmit(event)">
+      <!-- Asset Selection -->
+      <div class="form-group">
+        <label class="form-label" for="field-select-asset">Select Ghat Asset *</label>
+        <select id="field-select-asset" class="form-select" required>
+          <option value="">-- Choose Asset Fleet Item (40 total) --</option>
+          {% for a in assets %}
+          <option value="{{ a.id }}" data-status="{{ a.status }}">
+            #{{ a.id }} &bull; {{ a.name }} ({{ a.ghat.name }} &bull; {{ a.type }}) [{{ a.status }}]
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Status Selection -->
+      <div class="form-group">
+        <label class="form-label" for="field-select-asset-status">Operational Condition *</label>
+        <select id="field-select-asset-status" class="form-select" required>
+          <option value="faulty" selected>⚠️ Faulty (Needs immediate attention)</option>
+          <option value="under maintenance">🔧 Under Maintenance</option>
+          <option value="working">✅ Working (Restored)</option>
+        </select>
+      </div>
+
+      <!-- Severity Selection -->
+      <div class="form-group">
+        <label class="form-label" for="field-select-severity">Alert Priority Level *</label>
+        <select id="field-select-severity" class="form-select" required>
+          <option value="high" selected>🔴 High Priority (Safety or water/power outage)</option>
+          <option value="medium">🟡 Medium Priority (Routine repair)</option>
+          <option value="low">🔵 Low Priority (Informational)</option>
+        </select>
+      </div>
+
+      <!-- Asset Note -->
+      <div class="form-group">
+        <label class="form-label" for="field-asset-note">Fault Symptoms / Work Required</label>
+        <textarea id="field-asset-note" class="form-input" rows="3" placeholder="Describe fault: e.g. pump motor tripping, water tap leakage, bulb shattered..."></textarea>
+      </div>
+
+      <!-- Asset Photo -->
+      <div class="form-group">
+        <label class="form-label">Asset Photo (Optional)</label>
+        <div class="photo-upload-zone" onclick="document.getElementById('field-asset-photo-file').click()">
+          <div style="font-size: 1.8rem; margin-bottom: 4px;">📸</div>
+          <div style="font-size: 0.88rem; font-weight: 700; color: var(--navy);">Tap to Snap Fault Photo</div>
+          <input type="file" id="field-asset-photo-file" accept="image/*" capture="environment" style="display: none;" onchange="previewAssetPhoto(event)">
+          <img id="asset-photo-preview-img" class="photo-preview" alt="Asset fault preview">
+        </div>
+      </div>
+
+      <button type="submit" id="btn-submit-asset" class="btn btn-primary btn-lg btn-block" style="padding: 16px; background: var(--red); border-color: var(--red);">
+        🚨 Broadcast Fault Alert to Control Room
+      </button>
+    </form>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  let currentWorkPhotoBase64 = null;
+  let currentAssetPhotoBase64 = null;
+
+  function switchFieldTab(tab) {
+    const worksPanel = document.getElementById('tab-panel-works');
+    const assetsPanel = document.getElementById('tab-panel-assets');
+    const btnWorks = document.getElementById('tab-btn-works');
+    const btnAssets = document.getElementById('tab-btn-assets');
+
+    if (tab === 'works') {
+      worksPanel.style.display = 'block';
+      assetsPanel.style.display = 'none';
+      btnWorks.classList.add('active');
+      btnAssets.classList.remove('active');
+    } else {
+      worksPanel.style.display = 'none';
+      assetsPanel.style.display = 'block';
+      btnWorks.classList.remove('active');
+      btnAssets.classList.add('active');
+    }
+  }
+
+  function updateSliderDisplay(val) {
+    document.getElementById('slider-val-display').innerText = val + '%';
+  }
+
+  function handleWorkSelectChange(selectElem) {
+    const selectedOpt = selectElem.options[selectElem.selectedIndex];
+    if (selectedOpt && selectedOpt.dataset.progress) {
+      const p = selectedOpt.dataset.progress;
+      document.getElementById('field-slider-progress').value = p;
+      updateSliderDisplay(p);
+    }
+  }
+
+  // Canvas image compression (max width 1000px, 0.72 quality)
+  function compressImage(file, callback) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        const maxWidth = 1000;
+        let w = img.width;
+        let h = img.height;
+        if (w > maxWidth) {
+          h = Math.round((h * maxWidth) / w);
+          w = maxWidth;
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.72);
+        callback(dataUrl);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function previewWorkPhoto(event) {
+    const file = event.target.files[0];
+    if (file) {
+      compressImage(file, function(compressedBase64) {
+        currentWorkPhotoBase64 = compressedBase64;
+        const preview = document.getElementById('photo-preview-img');
+        preview.src = compressedBase64;
+        preview.style.display = 'block';
+      });
+    }
+  }
+
+  function previewAssetPhoto(event) {
+    const file = event.target.files[0];
+    if (file) {
+      compressImage(file, function(compressedBase64) {
+        currentAssetPhotoBase64 = compressedBase64;
+        const preview = document.getElementById('asset-photo-preview-img');
+        preview.src = compressedBase64;
+        preview.style.display = 'block';
+      });
+    }
+  }
+
+  async function handleFieldWorkSubmit(event) {
+    event.preventDefault();
+    const workSelect = document.getElementById('field-select-work');
+    const workId = workSelect.value;
+    const progress = parseInt(document.getElementById('field-slider-progress').value, 10);
+    const note = document.getElementById('field-input-note').value.trim();
+    const updatedBy = document.getElementById('field-officer-name').value.trim();
+    const prevStatus = workSelect.options[workSelect.selectedIndex].dataset.status || 'unknown';
+
+    if (!workId) {
+      showToast("Please choose a work package", "error");
+      return;
+    }
+
+    const btn = document.getElementById('btn-submit-work');
+    btn.disabled = true;
+    btn.innerText = "Transmitting to Control Room...";
+
+    try {
+      const res = await fetch(`/api/works/${workId}/update`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          progress_pct: progress,
+          note: note,
+          updated_by: updatedBy,
+          photo: currentWorkPhotoBase64,
+          photo_url: null
+        })
+      });
+
+      if (res.ok) {
+        const updateData = await res.json();
+        
+        // Fetch updated work status
+        const workRes = await fetch(`/api/works/${workId}`);
+        let newStatus = 'updated';
+        if (workRes.ok) {
+          const wObj = await workRes.json();
+          newStatus = wObj.status;
+        }
+
+        const fb = document.getElementById('feedback-container');
+        const fbTitle = document.getElementById('feedback-title');
+        const fbMsg = document.getElementById('feedback-message');
+
+        fb.style.display = 'block';
+        fb.style.background = '#ecfdf5';
+        fb.style.borderLeftColor = 'var(--green)';
+        fbTitle.innerText = "✓ Work Progress Transmitted Successfully!";
+        fbMsg.innerHTML = `Work #${workId} progress updated to <strong>${progress}%</strong>.<br>` +
+          `Status Transition: <span class="badge badge-${prevStatus.replace(' ', '')}">${prevStatus}</span> &rarr; ` +
+          `<span class="badge badge-${newStatus.replace(' ', '')}">${newStatus}</span>.<br>` +
+          `Milestone logged in <strong>Engineer Updates</strong> and central alerts refreshed.`;
+
+        showToast(`Work #${workId} updated to ${progress}% (${newStatus})`, 'success');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // Reset inputs
+        document.getElementById('field-input-note').value = "";
+        currentWorkPhotoBase64 = null;
+        document.getElementById('photo-preview-img').style.display = 'none';
+      } else {
+        const err = await res.json();
+        showToast("Error updating work: " + (err.detail || "Server error"), "error");
+      }
+    } catch (e) {
+      showToast("Network failure transmitting update", "error");
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "🚀 Transmit Work Update to Control Room";
+    }
+  }
+
+  async function handleFieldAssetSubmit(event) {
+    event.preventDefault();
+    const assetSelect = document.getElementById('field-select-asset');
+    const assetId = assetSelect.value;
+    const status = document.getElementById('field-select-asset-status').value;
+    const severity = document.getElementById('field-select-severity').value;
+    const note = document.getElementById('field-asset-note').value.trim();
+
+    if (!assetId) {
+      showToast("Please choose an asset fleet item", "error");
+      return;
+    }
+
+    const btn = document.getElementById('btn-submit-asset');
+    btn.disabled = true;
+    btn.innerText = "Transmitting Alert...";
+
+    try {
+      const res = await fetch(`/api/assets/${assetId}/status`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: status,
+          note: note,
+          severity: severity,
+          reported_by: "Site QC Engineer",
+          photo: currentAssetPhotoBase64
+        })
+      });
+
+      if (res.ok) {
+        const fb = document.getElementById('feedback-container');
+        const fbTitle = document.getElementById('feedback-title');
+        const fbMsg = document.getElementById('feedback-message');
+
+        fb.style.display = 'block';
+        fb.style.background = status === 'faulty' ? '#fef2f2' : '#ecfdf5';
+        fb.style.borderLeftColor = status === 'faulty' ? 'var(--red)' : 'var(--green)';
+
+        fbTitle.innerText = status === 'faulty' ? "🚨 Asset Outage Alert Broadcasted!" : "✓ Asset Condition Restored!";
+        fbMsg.innerHTML = `Asset #${assetId} marked as <strong>${status.toUpperCase()}</strong>.<br>` +
+          `Automatic ${severity.toUpperCase()} priority alert registered. Visible in <strong>Alerts Feed</strong> and <strong>Engineer Updates</strong>.`;
+
+        showToast(`Asset #${assetId} marked as ${status}`, status === 'faulty' ? 'error' : 'success');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        document.getElementById('field-asset-note').value = "";
+        currentAssetPhotoBase64 = null;
+        document.getElementById('asset-photo-preview-img').style.display = 'none';
+      } else {
+        const err = await res.json();
+        showToast("Failed to update asset: " + (err.detail || "Error"), "error");
+      }
+    } catch (e) {
+      showToast("Network error updating asset", "error");
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "🚨 Broadcast Fault Alert to Control Room";
+    }
+  }
+</script>
+{% endblock %}

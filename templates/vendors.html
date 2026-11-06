@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Contractor &amp; Vendor Performance | GhatMitra (ఘాట్ మిత్ర){% endblock %}
+
+{% block content %}
+<div>
+  <!-- Thin Kolam Banner Header -->
+  <div class="inner-page-banner">
+    <div>
+      <h2>
+        <span>👷</span> Empanelled Contractor Scorecard &amp; Rankings ({{ vendors|length }})
+      </h2>
+      <p>
+        Ranked using composite formula: <strong>50% On-Time %</strong> + <strong>30% Quality Rating</strong> + <strong>20% (100 - 10 per alert)</strong>.
+      </p>
+    </div>
+    <div style="font-size: 0.8rem; color: #cbd5e1; font-weight: 600;">
+      10 Active Vendors Tracked
+    </div>
+  </div>
+
+  <!-- Vendors Grid -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 20px;">
+    {% for v in vendors %}
+    <div class="content-card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between; border-top: 4px solid {% if v.rank == 1 %}#eab308{% elif v.rank <= 3 %}#38bdf8{% else %}#cbd5e1{% endif %};">
+      <div>
+        <!-- Top Row with Rank and Score -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="background: {% if v.rank == 1 %}#fef9c3{% elif v.rank <= 3 %}#e0f2fe{% else %}#f1f5f9{% endif %}; color: {% if v.rank == 1 %}#854d0e{% elif v.rank <= 3 %}#0369a1{% else %}#475569{% endif %}; padding: 3px 10px; border-radius: 20px; font-weight: 900; font-size: 0.85rem; border: 1px solid #cbd5e1;">
+                🏆 Rank #{{ v.rank }}
+              </span>
+              <span style="font-size: 0.82rem; color: #64748b;">ID: #{{ v.id }}</span>
+            </div>
+            <h3 style="font-size: 1.2rem; font-weight: 800; color: #0f172a; margin: 6px 0 2px;">{{ v.name }}</h3>
+            <div style="font-size: 0.82rem; color: #64748b;">
+              Contact Person: <strong>{{ v.contact_person }}</strong>
+            </div>
+          </div>
+
+          <!-- Composite Score Badge -->
+          <div style="text-align: right; background: #fff7ed; border: 1.5px solid #fed7aa; border-radius: 10px; padding: 6px 12px;">
+            <div style="font-size: 0.72rem; color: #c2410c; text-transform: uppercase; font-weight: 700;">Score</div>
+            <div style="font-size: 1.6rem; font-weight: 900; color: #ea580c; line-height: 1;">
+              {{ v.score }}<span style="font-size: 0.85rem; color: #9a3412;">/100</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 14px; font-size: 0.84rem;">
+          <div>
+            <span style="color: #64748b; display: block; font-size: 0.75rem;">On-Time Rate (50%):</span>
+            <strong style="color: {% if v.on_time_pct >= 90 %}#10b981{% elif v.on_time_pct >= 75 %}#f59e0b{% else %}#ef4444{% endif %}; font-size: 1.05rem;">
+              {{ v.on_time_pct }}%
+            </strong>
+          </div>
+          <div>
+            <span style="color: #64748b; display: block; font-size: 0.75rem;">Quality Rating (30%):</span>
+            <strong style="color: #0f172a; font-size: 1.05rem;">
+              ⭐ {{ v.quality_rating }} / 5.0
+            </strong>
+          </div>
+          <div>
+            <span style="color: #64748b; display: block; font-size: 0.75rem;">Staff Deployed:</span>
+            <strong style="color: #0f172a; font-size: 0.95rem;">{{ v.staff_deployed }} Workers</strong>
+          </div>
+          <div>
+            <span style="color: #64748b; display: block; font-size: 0.75rem;">Open Alerts Penalty:</span>
+            <strong style="color: {% if v.open_alerts_count > 0 %}#ef4444{% else %}#10b981{% endif %}; font-size: 0.95rem;">
+              {{ v.open_alerts_count }} Open Alerts (-{{ v.open_alerts_count * 10 }} pts)
+            </strong>
+          </div>
+        </div>
+
+        <!-- Score Breakdown Formula Bar -->
+        <div style="font-size: 0.75rem; color: #64748b; background: #fff; border: 1px dashed var(--border-slate); border-radius: 6px; padding: 6px 10px; margin-bottom: 14px;">
+          Formula: On-Time ({{ v.score_breakdown.on_time_component }} pts) + Quality ({{ v.score_breakdown.quality_component }} pts) + Compliance ({{ v.score_breakdown.alert_component }} pts)
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-slate); padding-top: 12px;">
+        <span style="font-size: 0.8rem; color: #475569;">
+          <strong>{{ v.works_count }}</strong> assigned packages
+        </span>
+        <a href="/works?vendor_id={{ v.id }}" class="btn btn-secondary btn-sm">
+          View Work Packages &rarr;
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

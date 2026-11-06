@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}GhatMitra (ఘాట్ మిత్ర) | Every ghat, every asset, every pilgrim looked after{% endblock %}</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏗️</text></svg>">
+  
+  <!-- Preconnect & Non-Blocking Font Loading -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="/static/css/style.css">
+  
+  {% block head_extra %}{% endblock %}
+</head>
+<body>
+
+  <!-- Sticky Navy Top Header -->
+  <header class="site-header">
+    <div class="header-container">
+      
+      <!-- Brand & Tagline -->
+      <a href="/#home" class="brand-block">
+        <div class="brand-icon">🛕</div>
+        <div class="brand-text">
+          <h1>GhatMitra <span class="badge-year" style="font-size: 0.72rem; padding: 2px 6px;">ఘాట్ మిత్ర</span></h1>
+          <p>Every ghat, every asset, every pilgrim looked after</p>
+        </div>
+      </a>
+
+      <!-- SPA Hash Navigation Tabs -->
+      <nav class="nav-links" id="main-nav-tabs">
+        <a href="/#home" class="nav-item active" data-tab="home">
+          <span>🏠</span> Home
+        </a>
+        <a href="/#guard" class="nav-item" data-tab="guard" id="nav-tab-guard">
+          <span>🛡️</span> Guard Reports <span class="tile-badge-inline" id="nav-badge-guard" style="display: none;">0</span>
+        </a>
+        <a href="/#field" class="nav-item" data-tab="field" id="nav-tab-field">
+          <span>👷</span> Engineer Updates <span class="tile-badge-inline" id="nav-badge-field" style="display: none;">0</span>
+        </a>
+        <a href="/#works" class="nav-item" data-tab="works">
+          <span>🔨</span> Works
+        </a>
+        <a href="/#assets" class="nav-item" data-tab="assets">
+          <span>📦</span> Assets
+        </a>
+        <a href="/#vendors" class="nav-item" data-tab="vendors">
+          <span>🤝</span> Vendors
+        </a>
+        <a href="/#alerts" class="nav-item" data-tab="alerts" id="nav-tab-alerts">
+          <span>🚨</span> Alerts
+        </a>
+        <a href="/#report" class="nav-item" data-tab="report">
+          <span>📄</span> Readiness
+        </a>
+      </nav>
+
+      <!-- Right Header Actions -->
+      <div class="header-actions">
+        <!-- Live Real-Time Sync Indicator -->
+        <div class="live-sync-pill" id="live-sync-indicator" title="Real-time central command sync">
+          <span class="live-sync-dot" id="live-sync-dot"></span>
+          <span id="live-sync-text">Live: Synced</span>
+        </div>
+
+        <!-- Sound Alert Beep Toggle -->
+        <button class="pill-action-btn" id="sound-toggle-btn" onclick="toggleAudioBeep()" title="Alert chime for new guard reports">
+          <span id="sound-icon">🔕</span> <span id="sound-label">Beep: Off</span>
+        </button>
+
+        <!-- Saffron Demo Tour Button -->
+        <button class="btn-demo-mode" onclick="startDemoMode()" title="Start guided 5-step control-room demo tour">
+          <span>⚡</span> Demo
+        </button>
+
+        <!-- Settings Dropdown Ghost -->
+        <div class="settings-menu">
+          <button class="btn-settings-ghost" onclick="toggleSettingsDropdown(event)" title="Settings & Admin Tools">
+            ⚙️
+          </button>
+          <div id="settings-dropdown" class="settings-dropdown">
+            <button onclick="toggleLiteMode()">
+              <span id="lite-mode-status">🍃 Lite Mode: OFF</span>
+            </button>
+            <a href="/field" target="_blank">
+              <span>📱</span> Open Engineer Update (/field)
+            </a>
+            <a href="/guard" target="_blank">
+              <span>🛡️</span> Open Guard Reports (/guard)
+            </a>
+            <button onclick="resetDemoData()">
+              <span>🔄</span> Reset Demo Data
+            </button>
+            <a href="/health" target="_blank">
+              <span>🩺</span> System Health Check
+            </a>
+            <a href="/api/export/works.csv">
+              <span>📥</span> Export Works CSV
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Top Ribbon with Pushkaralu Grid Status -->
+  <div style="background: #fff8e1; border-bottom: 1px solid #fde68a; padding: 7px 20px; font-size: 0.82rem; color: #78350f;">
+    <div style="max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+      <div>
+        <strong>🚩 Godavari Pushkaralu 2027:</strong> 5 Bathing Ghats Active &bull; Rajamahendravaram Municipal Corporation
+      </div>
+      <div>
+        Helpline: <strong style="color: #ea580c;">1800-425-0066</strong> &bull; <span style="color: #16a34a; font-weight: 700;">● Live Central Sync</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Body -->
+  <main class="main-wrapper">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Government-Grade Footer -->
+  <footer class="app-footer">
+    <div style="max-width: 1280px; margin: 0 auto;">
+      <p style="font-weight: 700; color: #e2e8f0; margin-bottom: 4px; font-size: 0.88rem;">
+        GhatMitra (ఘాట్ మిత్ర) &bull; Every ghat, every asset, every pilgrim looked after &bull; Municipal Corporation of Rajamahendravaram (RMC)
+      </p>
+      <p style="color: #94a3b8; font-size: 0.76rem;">
+        Built for Godavari Pushkaralu 2027. Open APIs for command centre integration.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Bottom Mobile Tab Bar (5 Icons, 390px friendly) -->
+  <nav class="mobile-bottom-tabs" id="mobile-tab-bar" aria-label="Mobile navigation">
+    <a href="/#home" class="mobile-tab-item active" data-tab="home">
+      <span class="mobile-tab-icon">🏠</span>
+      <span class="mobile-tab-label">Home</span>
+    </a>
+    <a href="/#guard" class="mobile-tab-item" data-tab="guard">
+      <span class="mobile-tab-icon">🛡️</span>
+      <span class="mobile-tab-label">Reports</span>
+      <span class="mobile-badge" id="mob-badge-guard" style="display: none;">0</span>
+    </a>
+    <a href="/#works" class="mobile-tab-item" data-tab="works">
+      <span class="mobile-tab-icon">🔨</span>
+      <span class="mobile-tab-label">Works</span>
+    </a>
+    <a href="/#assets" class="mobile-tab-item" data-tab="assets">
+      <span class="mobile-tab-icon">📦</span>
+      <span class="mobile-tab-label">Assets</span>
+    </a>
+    <a href="/#report" class="mobile-tab-item" data-tab="report">
+      <span class="mobile-tab-icon">📄</span>
+      <span class="mobile-tab-label">More</span>
+    </a>
+  </nav>
+
+  <!-- Universal Toast Container -->
+  <div id="toast-container"></div>
+
+  <!-- Demo Mode Overlay & Floating Controller -->
+  <div id="demo-overlay" class="demo-overlay"></div>
+  
+  <div id="demo-float-panel" class="demo-float-panel" style="display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="background: var(--saffron); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 800;" id="demo-step-num">Step 1 of 5</span>
+        <strong id="demo-step-title" style="font-size: 1.05rem; color: var(--text-dark);">Control Room View</strong>
+      </div>
+      <button onclick="exitDemoMode()" style="background: none; border: none; font-size: 1.3rem; color: #64748b; cursor: pointer;">&times;</button>
+    </div>
+    
+    <p id="demo-step-text" style="font-size: 0.88rem; color: #475569; line-height: 1.45; margin-bottom: 16px;">
+      Notice the executive KPIs at the top: 30 Works across 5 Ghats, with 9 Delayed Works (30%) and ₹2.14 Cr of Budget at Risk.
+    </p>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 12px;">
+      <button class="btn btn-secondary btn-sm" onclick="resetDemoData()" style="color: #dc2626;">
+        🔄 Reset Seed Data
+      </button>
+
+      <div style="display: flex; gap: 8px;">
+        <button class="btn btn-secondary btn-sm" onclick="prevDemoStep()">
+          ← Back
+        </button>
+        <button class="btn btn-primary btn-sm" id="demo-next-btn" onclick="nextDemoStep()">
+          Next Step →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Demo Mode Split Side Drawer for Step 2 -->
+  <div id="demo-split-drawer" class="demo-split-drawer">
+    <div style="background: var(--navy); color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center;">
+      <h3 style="font-size: 1.05rem; margin: 0; font-weight: 800;">📱 Field Officer Mobile Simulator</h3>
+      <button onclick="closeDemoDrawer()" style="background: none; border: none; color: white; font-size: 1.4rem; cursor: pointer;">&times;</button>
+    </div>
+    <div style="padding: 20px; flex: 1;">
+      <div style="background: #fff7ed; border-left: 4px solid var(--saffron); padding: 10px 14px; border-radius: 6px; font-size: 0.82rem; color: #9a3412; margin-bottom: 16px;">
+        <strong>Guided Simulation:</strong> The form below has been pre-populated with an on-ground delay report. Click "Save &amp; Transmit Update" to test real-time reactivity!
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Selected Work Package:</label>
+        <select id="field-work-select" class="form-select">
+          <option value="2">#2 - Modular Bio-Toilet Block A (Pushkar Ghat)</option>
+          <option value="1">#1 - Main Steps Granite Cladding (Pushkar Ghat)</option>
+          <option value="3">#3 - High-Mast Flood Lighting (Kotilingala Ghat)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Progress Percentage:</label>
+        <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 1rem; color: var(--saffron);">
+          <span>Reported: 25%</span>
+        </div>
+        <input type="range" id="field-progress" min="0" max="100" value="25" class="form-input" style="width: 100%;">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Field Inspection Note:</label>
+        <textarea id="field-note" class="form-input" rows="3">DEMO ALERT: Heavy river silt seepage halted concrete footing works. Work lagging behind schedule.</textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Reporting Officer:</label>
+        <input type="text" id="field-by" class="form-input" value="Er. S. Rao (Site Engineer)">
+      </div>
+
+      <button class="btn btn-primary btn-block btn-lg" onclick="nextDemoStep()">
+        Save &amp; Transmit to Control Room →
+      </button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/static/js/main.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

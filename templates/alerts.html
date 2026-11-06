@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Incident &amp; Works Alerts | GhatMitra (ఘాట్ మిత్ర){% endblock %}
+
+{% block content %}
+<div>
+  <!-- Thin Kolam Banner Header -->
+  <div class="inner-page-banner">
+    <div>
+      <h2>
+        <span>🚨</span> Infrastructure &amp; Asset Alerts Incident Feed ({{ alerts|length }})
+      </h2>
+      <p>
+        Real-time escalation stream for delays, asset breakdowns, structural hazards, and overdue service intervals.
+      </p>
+    </div>
+    <div style="font-size: 0.8rem; color: #cbd5e1; font-weight: 600;">
+      Live Escalation Stream
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <form method="get" action="/alerts" class="filter-bar">
+    <div>
+      <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 2px;">Severity:</label>
+      <select name="severity" class="form-select" onchange="this.form.submit()">
+        <option value="">All Severities</option>
+        <option value="high" {% if selected_severity == 'high' %}selected{% endif %}>High Severity</option>
+        <option value="medium" {% if selected_severity == 'medium' %}selected{% endif %}>Medium Severity</option>
+        <option value="low" {% if selected_severity == 'low' %}selected{% endif %}>Low Severity</option>
+      </select>
+    </div>
+
+    <div>
+      <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 2px;">Status:</label>
+      <select name="status" class="form-select" onchange="this.form.submit()">
+        <option value="">All Statuses</option>
+        <option value="open" {% if selected_status == 'open' %}selected{% endif %}>Open</option>
+        <option value="resolved" {% if selected_status == 'resolved' %}selected{% endif %}>Resolved</option>
+      </select>
+    </div>
+
+    <div style="margin-top: 18px;">
+      <a href="/alerts" class="btn btn-secondary btn-sm">Reset Filters</a>
+    </div>
+  </form>
+
+  <!-- Alerts List -->
+  <div class="content-card" style="padding: 0; overflow: hidden;">
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Type</th>
+            <th>Severity</th>
+            <th>Alert Message &amp; Context</th>
+            <th>Related Entity</th>
+            <th>Reported Time</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in alerts %}
+          <tr style="background: {% if a.status == 'open' and a.severity == 'high' %}#fff5f5{% elif a.status == 'resolved' %}#fafafa{% else %}#ffffff{% endif %};">
+            <td><strong>#{{ a.id }}</strong></td>
+            <td><strong>{{ a.type }}</strong></td>
+            <td>
+              <span class="badge badge-{{ a.severity }}">{{ a.severity }}</span>
+            </td>
+            <td style="max-width: 420px; font-size: 0.88rem; color: #1e293b; line-height: 1.4;">
+              {{ a.message }}
+            </td>
+            <td style="font-size: 0.82rem;">
+              {% if a.related_work %}
+                <a href="/works/{{ a.related_work.id }}" style="color: #ea580c; font-weight: 600; text-decoration: none;">
+                  🔨 Work: {{ a.related_work.title[:30] }}...
+                </a>
+              {% elif a.related_asset %}
+                <span style="color: #6d28d9; font-weight: 600;">
+                  📦 Asset: {{ a.related_asset.name }}
+                </span>
+              {% else %}
+                <span style="color: #94a3b8;">General</span>
+              {% endif %}
+            </td>
+            <td style="font-size: 0.8rem; color: #64748b;">
+              {{ a.created_at.strftime('%d %b %Y, %H:%M') }}
+            </td>
+            <td>
+              <span class="badge {% if a.status == 'open' %}badge-delayed{% else %}badge-completed{% endif %}">
+                {{ a.status }}
+              </span>
+            </td>
+            <td>
+              {% if a.status == 'open' %}
+              <button class="btn btn-secondary btn-sm" onclick="resolveAlert({{ a.id }})">
+                ✓ Resolve
+              </button>
+              {% else %}
+              <span style="color: #10b981; font-size: 0.8rem; font-weight: 700;">Resolved</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

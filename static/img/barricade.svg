@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <!-- Crowd Safety Barricade Illustration -->
+  <rect width="80" height="80" rx="16" fill="#fff7ed" />
+  
+  <!-- Left & Right Stanchion Legs -->
+  <path d="M16 66 L 22 36 L 26 36 L 22 66 Z" fill="#475569" />
+  <path d="M12 66 L 26 66" stroke="#334155" stroke-width="3" stroke-linecap="round" />
+  
+  <path d="M64 66 L 58 36 L 54 36 L 58 66 Z" fill="#475569" />
+  <path d="M54 66 L 68 66" stroke="#334155" stroke-width="3" stroke-linecap="round" />
+
+  <!-- Horizontal Barrier Rails with Warning Stripes -->
+  <!-- Top Rail -->
+  <rect x="14" y="34" width="52" height="9" rx="2" fill="#ea580c" />
+  <!-- Yellow/White Warning Chevrons -->
+  <path d="M22 34 L 18 43 L 23 43 L 27 34 Z" fill="#ffffff" />
+  <path d="M34 34 L 30 43 L 35 43 L 39 34 Z" fill="#ffffff" />
+  <path d="M46 34 L 42 43 L 47 43 L 51 34 Z" fill="#ffffff" />
+  <path d="M58 34 L 54 43 L 59 43 L 63 34 Z" fill="#ffffff" />
+
+  <!-- Bottom Rail -->
+  <rect x="16" y="47" width="48" height="7" rx="1.5" fill="#f97316" />
+  <path d="M26 47 L 23 54 L 27 54 L 30 47 Z" fill="#ffffff" />
+  <path d="M38 47 L 35 54 L 39 54 L 42 47 Z" fill="#ffffff" />
+  <path d="M50 47 L 47 54 L 51 54 L 54 47 Z" fill="#ffffff" />
+
+  <!-- Safety Reflector Beacon -->
+  <circle cx="40" cy="28" r="4.5" fill="#ef4444" stroke="#ffffff" stroke-width="1.5" />
+</svg>

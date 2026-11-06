@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+
+{% block title %}Readiness Executive Report | GhatMitra (ఘాట్ మిత్ర){% endblock %}
+
+{% block head_extra %}
+<style>
+  .report-sheet {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px 40px;
+    box-shadow: var(--shadow);
+    max-width: 1040px;
+    margin: 0 auto 30px;
+  }
+  .report-header {
+    border-bottom: 3px double var(--navy);
+    padding-bottom: 20px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .report-title-block h1 {
+    font-family: 'Georgia', serif;
+    font-size: 1.85rem;
+    color: var(--navy);
+    margin-bottom: 4px;
+    letter-spacing: -0.5px;
+  }
+  .export-toolbar {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .report-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .report-kpi-cell {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    background: #f8fafc;
+  }
+  .report-section-title {
+    font-family: 'Georgia', serif;
+    font-size: 1.15rem;
+    color: var(--navy);
+    border-bottom: 1.5px solid var(--border);
+    padding-bottom: 6px;
+    margin: 24px 0 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  @media print {
+    body {
+      background: #ffffff !important;
+      font-size: 10pt;
+    }
+    .report-sheet {
+      border: none !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      max-width: 100% !important;
+    }
+    .export-toolbar, .no-print {
+      display: none !important;
+    }
+    .report-title-block h1 {
+      font-size: 1.5rem !important;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="report-wrapper">
+
+  <!-- Thin Kolam Banner Header (Hidden in Print) -->
+  <div class="inner-page-banner no-print">
+    <div>
+      <h2>
+        <span>📄</span> Pushkaralu Readiness &amp; Executive Audit Report
+      </h2>
+      <p>
+        Official readiness and financial risk summary for Godavari Pushkaralu 2027 &bull; Municipal Corporation of Rajamahendravaram
+      </p>
+    </div>
+    <div style="font-size: 0.82rem; color: #cbd5e1; font-weight: 700;">
+      Target: 26 June 2027 ({{ summary.days_left }} Days Left)
+    </div>
+  </div>
+
+  <!-- Download & Print Action Toolbar (Hidden in Print) -->
+  <div class="export-toolbar no-print">
+    <div>
+      <span style="font-weight: 800; font-size: 0.92rem; color: var(--navy);">📥 Raw Data Exports (CSV)</span>
+      <span style="font-size: 0.8rem; color: var(--text-muted); margin-left: 8px;">Direct tabular dumps for analytics:</span>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+      <a href="/api/export/works.csv" class="btn btn-secondary btn-sm" download>
+        📄 Works CSV
+      </a>
+      <a href="/api/export/assets.csv" class="btn btn-secondary btn-sm" download>
+        📦 Assets CSV
+      </a>
+      <a href="/api/export/vendors.csv" class="btn btn-secondary btn-sm" download>
+        👷 Vendors CSV
+      </a>
+      <a href="/api/export/alerts.csv" class="btn btn-secondary btn-sm" download>
+        🚨 Alerts CSV
+      </a>
+
+      <button class="btn btn-primary btn-sm" onclick="window.print()" style="margin-left: 8px;">
+        🖨️ Print / Save as PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- Printable Executive Report Sheet -->
+  <article class="report-sheet">
+    
+    <!-- Report Header -->
+    <header class="report-header">
+      <div class="report-title-block">
+        <h1>Godavari Pushkaralu 2027 — Civil Readiness Report</h1>
+        <p style="font-size: 0.9rem; color: #475569; margin: 0;">
+          Municipal Corporation of Rajamahendravaram (RMC) &bull; Infrastructure &amp; Works Oversight
+        </p>
+      </div>
+      <div style="text-align: right; font-size: 0.8rem; color: var(--text-muted);">
+        <div><strong>Document:</strong> RMC-PW-2027-EX-01</div>
+        <div><strong>Generated:</strong> <span id="report-timestamp">Live Pushkar Sync</span></div>
+        <div><strong>Target Date:</strong> 26 June 2027 ({{ summary.days_left }} Days Left)</div>
+      </div>
+    </header>
+
+    <!-- Executive Summary KPIs -->
+    <div class="report-kpi-grid">
+      <div class="report-kpi-cell">
+        <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Total Works</div>
+        <div style="font-size: 1.5rem; font-weight: 900; color: var(--navy);">{{ summary.total_works }}</div>
+        <div style="font-size: 0.72rem; color: #64748b;">5 Bathing Ghats</div>
+      </div>
+      <div class="report-kpi-cell" style="border-left: 3px solid var(--red);">
+        <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--red); font-weight: 700;">Delayed Works</div>
+        <div style="font-size: 1.5rem; font-weight: 900; color: var(--red);">{{ summary.counts_by_status["delayed"] }}</div>
+        <div style="font-size: 0.72rem; color: var(--red-text);">{{ ((summary.counts_by_status["delayed"] / summary.total_works) * 100) | round(1) }}% of Portfolio</div>
+      </div>
+      <div class="report-kpi-cell" style="border-left: 3px solid var(--amber);">
+        <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--amber-text); font-weight: 700;">Budget at Risk</div>
+        <div style="font-size: 1.5rem; font-weight: 900; color: #b45309;">₹{{ "{:,.0f}".format(summary.budget.delayed_budget) }}</div>
+        <div style="font-size: 0.72rem; color: #92400e;">{{ summary.budget.delayed_budget_pct }}% of ₹{{ "{:,.0f}".format(summary.budget.total_budget) }}</div>
+      </div>
+      <div class="report-kpi-cell" style="border-left: 3px solid var(--purple);">
+        <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--purple); font-weight: 700;">Assets &amp; Alerts</div>
+        <div style="font-size: 1.5rem; font-weight: 900; color: var(--purple);">{{ summary.assets.faulty }} / {{ summary.open_alerts }}</div>
+        <div style="font-size: 0.72rem; color: #64748b;">Faulty Assets / Open Alerts</div>
+      </div>
+    </div>
+
+    <!-- Section 1: Top 5 Delayed Works -->
+    <section>
+      <div class="report-section-title">
+        <span>⚠️ Critical Delayed Works (Highest Financial Exposure)</span>
+        <span style="font-size: 0.8rem; font-family: sans-serif; color: var(--text-muted); font-weight: normal;">Showing Top 5</span>
+      </div>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Work Package</th>
+              <th>Ghat</th>
+              <th>Vendor</th>
+              <th>Progress</th>
+              <th>Target End</th>
+              <th style="text-align: right;">Sanctioned Budget</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for w in delayed_works %}
+            <tr>
+              <td>#{{ w.id }}</td>
+              <td><strong>{{ w.title }}</strong><br><span style="font-size: 0.75rem; color: #64748b;">{{ w.category }}</span></td>
+              <td>{{ w.ghat.name }}</td>
+              <td>{{ w.vendor.name }}</td>
+              <td><span class="badge badge-delayed">{{ w.progress_pct }}%</span></td>
+              <td>{{ w.planned_end.strftime('%d %b %Y') }}</td>
+              <td style="text-align: right; font-weight: 700;">₹{{ "{:,.0f}".format(w.budget) }}</td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="7" style="text-align: center; color: var(--green);">No delayed works found.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 2: Faulty Ghat Assets -->
+    <section>
+      <div class="report-section-title">
+        <span>🚨 Non-Functional Asset Inventory (Requiring Maintenance Action)</span>
+        <span style="font-size: 0.8rem; font-family: sans-serif; color: var(--text-muted); font-weight: normal;">{{ faulty_assets|length }} Equipment Units</span>
+      </div>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Asset ID</th>
+              <th>Equipment Name</th>
+              <th>Category</th>
+              <th>Installed Ghat</th>
+              <th>Condition</th>
+              <th>Last Service</th>
+              <th>Next Scheduled</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for a in faulty_assets %}
+            <tr>
+              <td>#{{ a.id }}</td>
+              <td><strong>{{ a.name }}</strong></td>
+              <td>{{ a.type }}</td>
+              <td>{{ a.ghat.name }}</td>
+              <td><span class="badge badge-faulty">{{ a.status }}</span></td>
+              <td>{{ a.last_service_date.strftime('%d %b %Y') if a.last_service_date else "N/A" }}</td>
+              <td><strong style="color: var(--red);">{{ a.next_service_date.strftime('%d %b %Y') if a.next_service_date else "Overdue" }}</strong></td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="7" style="text-align: center; color: var(--green);">All asset fleet units in working condition.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 3: Vendor Performance Ranking -->
+    <section>
+      <div class="report-section-title">
+        <span>🏆 Contractor Quality &amp; On-Time Scoring (Top 5 Ranking)</span>
+        <span style="font-size: 0.8rem; font-family: sans-serif; color: var(--text-muted); font-weight: normal;">Formula: 50% On-Time + 30% Quality + 20% Alert Penalty</span>
+      </div>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Contractor Name</th>
+              <th>Contact Person</th>
+              <th>Composite Score</th>
+              <th>On-Time %</th>
+              <th>Quality</th>
+              <th>Staff</th>
+              <th>Open Alerts</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for v in top_5_vendors %}
+            <tr>
+              <td><strong>#{{ v.rank }}</strong></td>
+              <td><strong>{{ v.name }}</strong></td>
+              <td>{{ v.contact_person }}</td>
+              <td><span class="badge badge-completed">{{ v.score }} / 100</span></td>
+              <td>{{ v.on_time_pct }}%</td>
+              <td>{{ v.quality_rating }} / 5.0</td>
+              <td>{{ v.staff_deployed }} pax</td>
+              <td>{{ v.open_alerts_count }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Report Footer Signoff -->
+    <div style="margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 0.8rem; color: #64748b;">
+      <div>
+        <strong>Municipal Commissioner</strong><br>
+        Rajamahendravaram Municipal Corporation
+      </div>
+      <div style="text-align: right;">
+        <strong>Superintending Engineer (Works)</strong><br>
+        Godavari Pushkaralu 2027 Engineering Cell
+      </div>
+    </div>
+
+  </article>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const ts = document.getElementById('report-timestamp');
+    if (ts) {
+      const now = new Date();
+      ts.innerText = now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) + 
+        ' ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    }
+  });
+</script>
+{% endblock %}
+

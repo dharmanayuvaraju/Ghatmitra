@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 45" fill="none">
+  <!-- Godavari Wooden Pilgrim Boat (Naava) -->
+  <!-- Wooden Hull -->
+  <path d="M4 26 C 14 36, 76 36, 86 26 C 88 23, 76 22, 45 22 C 14 22, 2 23, 4 26 Z" fill="#78350f" stroke="#451a03" stroke-width="1.2" />
+  <path d="M12 24 C 25 32, 65 32, 78 24 Z" fill="#92400e" />
+  
+  <!-- Bamboo Shade Canopy -->
+  <path d="M30 22 Q 45 12, 60 22 Z" fill="#d97706" stroke="#b45309" stroke-width="1" />
+  <line x1="32" y1="22" x2="32" y2="17" stroke="#451a03" stroke-width="1.5" />
+  <line x1="58" y1="22" x2="58" y2="17" stroke="#451a03" stroke-width="1.5" />
+  
+  <!-- Boatman Oar / Pole -->
+  <line x1="68" y1="12" x2="80" y2="34" stroke="#fed7aa" stroke-width="1.8" stroke-linecap="round" />
+  <!-- Boatman Silhouette -->
+  <circle cx="68" cy="11" r="3.5" fill="#451a03" />
+  <path d="M64 22 L 67 15 L 71 16 L 70 22 Z" fill="#451a03" />
+
+  <!-- Tiny Stern Diya Lamp Lantern -->
+  <circle cx="12" cy="20" r="3" fill="#ea580c" />
+  <circle cx="12" cy="20" r="1.5" fill="#fef08a" />
+</svg>
+

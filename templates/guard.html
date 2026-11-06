@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0a192f">
+  <title>పుష్కర్ గార్డ్ | Pushkar Guard</title>
+  
+  <style>
+    /* System fonts only - No external web fonts, zero CDN payload */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #f1f5f9;
+      color: #0f172a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.3;
+    }
+
+    /* Fixed High-Contrast Header */
+    .guard-header {
+      background: #0a192f;
+      color: #ffffff;
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 3px solid #ea580c;
+    }
+
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.95rem;
+      font-weight: 800;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pill-btn {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 6px 10px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .pill-btn:active {
+      background: #ea580c;
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #16a34a;
+    }
+
+    .status-dot.offline {
+      background: #f59e0b;
+    }
+
+    .pending-badge {
+      background: #ea580c;
+      color: #ffffff;
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    /* Main Container (Single Column, Mobile 360px+) */
+    .app-screen {
+      flex: 1;
+      max-width: 480px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 14px 12px 24px;
+      display: none;
+      flex-direction: column;
+    }
+
+    .app-screen.active {
+      display: flex;
+    }
+
+    /* Screen Titles & Guidance */
+    .screen-prompt {
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .prompt-te {
+      font-size: 1.45rem;
+      font-weight: 900;
+      color: #0a192f;
+      margin-bottom: 2px;
+    }
+
+    .prompt-en {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #475569;
+    }
+
+    /* Big Action Buttons (Minimum 64px tall, High Contrast) */
+    .btn-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .big-btn {
+      min-height: 66px;
+      width: 100%;
+      background: #ffffff;
+      border: 2px solid #cbd5e1;
+      border-radius: 14px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      text-align: left;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .big-btn:active {
+      background: #fff7ed;
+      border-color: #ea580c;
+      transform: scale(0.98);
+    }
+
+    .big-btn.selected {
+      border: 3px solid #ea580c;
+      background: #fff7ed;
+    }
+
+    .big-btn-icon {
+      font-size: 2.1rem;
+      flex-shrink: 0;
+      width: 44px;
+      text-align: center;
+    }
+
+    .big-btn-content {
+      flex: 1;
+    }
+
+    .big-btn-te {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.25;
+    }
+
+    .big-btn-en {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    /* Danger / Problem Specific Borders */
+    .big-btn.danger-issue {
+      border-left: 8px solid #dc2626;
+    }
+
+    .big-btn.warn-issue {
+      border-left: 8px solid #f59e0b;
+    }
+
+    /* Bottom Navigation Bar (Back & Home) */
+    .bottom-bar {
+      margin-top: 18px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .nav-btn {
+      min-height: 54px;
+      flex: 1;
+      border-radius: 12px;
+      border: 2px solid #cbd5e1;
+      background: #ffffff;
+      font-size: 1rem;
+      font-weight: 800;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .nav-btn:active {
+      background: #e2e8f0;
+    }
+
+    /* Giant Send Button */
+    .send-btn {
+      min-height: 72px;
+      width: 100%;
+      background: #16a34a;
+      color: #ffffff;
+      border: none;
+      border-radius: 14px;
+      font-size: 1.35rem;
+      font-weight: 900;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);
+      margin-top: 14px;
+    }
+
+    .send-btn:active {
+      background: #15803d;
+      transform: scale(0.98);
+    }
+
+    .send-btn-sub {
+      font-size: 0.85rem;
+      font-weight: 600;
+      opacity: 0.9;
+    }
+
+    /* PIN Screen Keypad */
+    .pin-display {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin: 20px 0 24px;
+    }
+
+    .pin-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid #0a192f;
+      background: #ffffff;
+    }
+
+    .pin-dot.filled {
+      background: #ea580c;
+      border-color: #ea580c;
+    }
+
+    .keypad-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      max-width: 320px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .key-btn {
+      min-height: 64px;
+      border-radius: 12px;
+      border: 2px solid #cbd5e1;
+      background: #ffffff;
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: #0a192f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .key-btn:active {
+      background: #e2e8f0;
+    }
+
+    .key-btn.action-clear {
+      font-size: 1.1rem;
+      color: #dc2626;
+    }
+
+    /* Summary Card (Screen 3) */
+    .summary-card {
+      background: #ffffff;
+      border: 2px solid #cbd5e1;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    .summary-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px dashed #e2e8f0;
+    }
+
+    .summary-row:last-child {
+      border-bottom: none;
+    }
+
+    /* Optional Photo & Note Area */
+    .optional-box {
+      background: #ffffff;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .photo-trigger-btn {
+      min-height: 56px;
+      width: 100%;
+      background: #f8fafc;
+      border: 2px dashed #94a3b8;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #0a192f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .photo-preview-wrap {
+      display: none;
+      margin-top: 10px;
+      text-align: center;
+      position: relative;
+    }
+
+    .photo-preview-img {
+      max-width: 100%;
+      max-height: 160px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+    }
+
+    .note-input {
+      width: 100%;
+      min-height: 48px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      resize: none;
+    }
+
+    /* Screen 4 Success Tick */
+    .tick-box {
+      text-align: center;
+      padding: 24px 12px;
+    }
+
+    .giant-tick {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: #16a34a;
+      color: #ffffff;
+      font-size: 3.5rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 16px rgba(22, 163, 74, 0.4);
+    }
+
+    .offline-banner {
+      background: #fff7ed;
+      border: 2px solid #f97316;
+      border-radius: 10px;
+      padding: 12px;
+      margin: 12px 0;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #9a3412;
+      text-align: center;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Fixed Bar -->
+  <header class="guard-header">
+    <div class="header-user">
+      <span id="user-display">👤 రాము / Ramu</span>
+      <span class="status-dot" id="online-dot" title="Network status"></span>
+    </div>
+
+    <div class="header-controls">
+      <span class="pending-badge" id="pending-badge" style="display: none;" onclick="retryPendingReports()">
+        📥 0
+      </span>
+      <button class="pill-btn" onclick="toggleLanguage()" id="lang-btn">
+        🌐 తెలుగు
+      </button>
+      <button class="pill-btn" onclick="logoutGuard()" style="background: rgba(220, 38, 38, 0.25);">
+        లాగౌట్
+      </button>
+    </div>
+  </header>
+
+  <!-- SCREEN 0: 4-DIGIT PIN LOGIN -->
+  <div class="app-screen" id="screen-pin">
+    <div class="screen-prompt" style="margin-top: 10px;">
+      <div style="font-size: 2.5rem; margin-bottom: 4px;">🚩</div>
+      <div class="prompt-te">గార్డ్ లాగిన్</div>
+      <div class="prompt-en">Guard Verification</div>
+      <div style="font-size: 0.85rem; color: #64748b; margin-top: 6px;">
+        4 అంకెల పిన్ నమోదు చేయండి / Enter 4-digit PIN
+      </div>
+    </div>
+
+    <div class="pin-display">
+      <div class="pin-dot" id="dot-0"></div>
+      <div class="pin-dot" id="dot-1"></div>
+      <div class="pin-dot" id="dot-2"></div>
+      <div class="pin-dot" id="dot-3"></div>
+    </div>
+
+    <div class="keypad-grid">
+      <button class="key-btn" onclick="pressPin('1')">1</button>
+      <button class="key-btn" onclick="pressPin('2')">2</button>
+      <button class="key-btn" onclick="pressPin('3')">3</button>
+      <button class="key-btn" onclick="pressPin('4')">4</button>
+      <button class="key-btn" onclick="pressPin('5')">5</button>
+      <button class="key-btn" onclick="pressPin('6')">6</button>
+      <button class="key-btn" onclick="pressPin('7')">7</button>
+      <button class="key-btn" onclick="pressPin('8')">8</button>
+      <button class="key-btn" onclick="pressPin('9')">9</button>
+      <button class="key-btn action-clear" onclick="clearPin()">❌ చెరిపివేయి</button>
+      <button class="key-btn" onclick="pressPin('0')">0</button>
+      <button class="key-btn" onclick="checkPin()" style="font-size: 1.1rem; color: #16a34a;">✅ సరే</button>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px; font-size: 0.82rem; color: #64748b; background: #e2e8f0; padding: 6px 12px; border-radius: 20px; width: fit-content; margin-left: auto; margin-right: auto;">
+      డెమో పిన్ / Demo PIN: <strong>1234</strong>
+    </div>
+  </div>
+
+  <!-- SCREEN 1: "Where are you?" (Ghats Selection) -->
+  <div class="app-screen" id="screen-1">
+    <div class="screen-prompt">
+      <div class="prompt-te">మీరు ఎక్కడ ఉన్నారు?</div>
+      <div class="prompt-en">Where are you? (Choose Ghat)</div>
+    </div>
+
+    <div class="btn-list">
+      {% for g in ghats %}
+      <button class="big-btn" id="ghat-btn-{{ g.id }}" onclick="chooseGhat({{ g.id }}, '{{ g.name_te }}', '{{ g.name_en }}')">
+        <span class="big-btn-icon">🚩</span>
+        <div class="big-btn-content">
+          <div class="big-btn-te">{{ g.name_te }}</div>
+          <div class="big-btn-en">{{ g.name_en }}</div>
+        </div>
+        <span style="font-size: 1.2rem; color: #94a3b8;">&rarr;</span>
+      </button>
+      {% endfor %}
+    </div>
+
+    <div style="text-align: center; margin-top: 14px; font-size: 0.78rem; color: #94a3b8;">
+      గమనిక: మీ ఘాట్ ఎంపిక గుర్తుంది / Last choice is remembered
+    </div>
+  </div>
+
+  <!-- SCREEN 2: "What is the problem?" (Problem Grid) -->
+  <div class="app-screen" id="screen-2">
+    <div class="screen-prompt">
+      <div class="prompt-te">సమస్య ఏమిటి?</div>
+      <div class="prompt-en">What is the problem?</div>
+    </div>
+
+    <div class="btn-list">
+      <!-- 1. Toilet -->
+      <button class="big-btn danger-issue" onclick="chooseIssue('toilet', '🚽', 'మరుగుదొడ్డి పనిచేయట్లేదు', 'Toilet not working')">
+        <span class="big-btn-icon">🚽</span>
+        <div class="big-btn-content">
+          <div class="big-btn-te">మరుగుదొడ్డి పనిచేయట్లేదు</div>
+          <div class="big-btn-en">Toilet not working</div>
+        </div>
+        <span style="font-size: 1.2rem; color: #dc2626;">&rarr;</span>
+      </button>
+
+      <!-- 2. Light -->
+      <button class="big-btn warn-issue" onclick="chooseIssue('light', '💡', 'లైటు వెలగట్లేదు', 'Light not working')">
+        <span class="big-btn-icon">💡</span>
+        <div class="big-btn-content">
+          <div class="big-btn-te">లైటు వెలగట్లేదు</div>
+          <div class="big-btn-en">Light not working</div>
+        </div>
+        <span style="font-size: 1.2rem; color: #f59e0b;">&rarr;</span>
+      </button>
+
+      <!-- 3. Dustbin -->
+      <button class="big-btn warn-issue" onclick="chooseIssue('bin', '🗑️', 'చెత్త కుండీ నిండింది', 'Dustbin full')">
+        <span class="big-btn-icon">🗑️</span>
+        <div class="big-btn-content">
+          <div class="big-btn-te">చెత్త కుండీ నిండింది</div>
+          <div class="big-btn-en">Dustbin full</div>
+        </div>
+        <span style="font-size: 1.2rem; color: #f59e0b;">&rarr;</span>
+      </button>
+
+      <!-- 4. Water -->
+      <button class="big-btn danger-issue" onclick="chooseIssue('water', '🚰', 'తాగునీరు లేదు', 'No drinking water')">
+        <span class="big-btn-icon">🚰</span>
+        <div class="big-btn-content">
+          <div class="big-btn-te">తాగునీరు లేదు</div>
+          <div class="big-btn-en">No drinking water</div>
+        </div>
+        <span style="font-size: 1.2rem; color: #dc2626;">&rarr;</span>
+      </button>
+
+      <!-- 5. Barrier or Steps -->
+      <button class="big-btn danger-issue" onclick="chooseIssue('barrier', '⚠️', 'మెట్లు/రక్షణ కంచె విరిగింది', 'Barrier or steps broken')">
+        <span class="big-btn-icon">⚠️</span>
+        <div class="big-btn-content">
+          <div class="big-btn-te">మెట్లు / రక్షణ కంచె విరిగింది</div>
+          <div class="big-btn-en">Barrier or steps broken</div>
+        </div>
+        <span style="font-size: 1.2rem; color: #dc2626;">&rarr;</span>
+      </button>
+
+      <!-- 6. Work delayed -->
+      <button class="big-btn warn-issue" onclick="chooseIssue('work_delayed', '⏳', 'పని ఆగింది/ఆలస్యం', 'Work is delayed or stopped')">
+        <span class="big-btn-icon">⏳</span>
+        <div class="big-btn-content">
+          <div class="big-btn-te">పని ఆగింది / ఆలస్యం</div>
+          <div class="big-btn-en">Work is delayed or stopped</div>
+        </div>
+        <span style="font-size: 1.2rem; color: #f59e0b;">&rarr;</span>
+      </button>
+
+      <!-- 7. Something else -->
+      <button class="big-btn" onclick="chooseIssue('other', '❓', 'వేరే సమస్య', 'Something else')">
+        <span class="big-btn-icon">❓</span>
+        <div class="big-btn-content">
+          <div class="big-btn-te">వేరే సమస్య</div>
+          <div class="big-btn-en">Something else</div>
+        </div>
+        <span style="font-size: 1.2rem; color: #64748b;">&rarr;</span>
+      </button>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="bottom-bar">
+      <button class="nav-btn" onclick="goToScreen(1)">
+        &larr; వెనుకకు / Back
+      </button>
+      <button class="nav-btn" onclick="goToScreen(1)">
+        🏠 మొదటికి / Home
+      </button>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: "Send / Summary" -->
+  <div class="app-screen" id="screen-3">
+    <div class="screen-prompt">
+      <div class="prompt-te">నివేదిక పంపండి</div>
+      <div class="prompt-en">Confirm &amp; Send to Control Room</div>
+    </div>
+
+    <!-- Summary Box -->
+    <div class="summary-card">
+      <div class="summary-row">
+        <span style="font-size: 1.8rem;">📍</span>
+        <div>
+          <div style="font-size: 0.76rem; color: #64748b; font-weight: 700; text-transform: uppercase;">ఘాట్ / Location</div>
+          <div style="font-size: 1.15rem; font-weight: 900; color: #0a192f;" id="summary-ghat-te">పుష్కర్ ఘాట్</div>
+          <div style="font-size: 0.85rem; color: #475569;" id="summary-ghat-en">Pushkar Ghat</div>
+        </div>
+      </div>
+
+      <div class="summary-row">
+        <span style="font-size: 1.8rem;" id="summary-issue-icon">🚽</span>
+        <div>
+          <div style="font-size: 0.76rem; color: #64748b; font-weight: 700; text-transform: uppercase;">సమస్య / Issue</div>
+          <div style="font-size: 1.15rem; font-weight: 900; color: #dc2626;" id="summary-issue-te">మరుగుదొడ్డి పనిచేయట్లేదు</div>
+          <div style="font-size: 0.85rem; color: #475569;" id="summary-issue-en">Toilet not working</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Optional Photo (Compressed to <150KB) -->
+    <div class="optional-box">
+      <label class="photo-trigger-btn" for="guard-photo-input">
+        <span style="font-size: 1.4rem;">📷</span>
+        <span id="photo-btn-text">ఫోటో తీయండి (ఐచ్ఛికం / Optional)</span>
+      </label>
+      <input type="file" id="guard-photo-input" accept="image/*" capture="environment" style="display: none;" onchange="handlePhotoSelect(event)">
+      
+      <div class="photo-preview-wrap" id="photo-preview-wrap">
+        <img id="photo-preview-img" class="photo-preview-img" alt="Preview">
+        <div style="margin-top: 4px;">
+          <button type="button" onclick="removePhoto()" style="background: none; border: none; color: #dc2626; font-size: 0.82rem; font-weight: 700; cursor: pointer;">
+            ❌ ఫోటో తీసివేయండి / Remove
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Optional Short Note -->
+    <div class="optional-box">
+      <div style="font-size: 0.82rem; font-weight: 700; color: #475569; margin-bottom: 4px;">
+        చిన్న వివరాలు (ఐచ్ఛికం / Optional Note)
+      </div>
+      <input type="text" id="guard-note-input" class="note-input" placeholder="ఉదా: ట్యాప్ లీక్ అవుతోంది / e.g. Tap leaking">
+    </div>
+
+    <!-- Giant Send Button -->
+    <button class="send-btn" id="btn-send-report" onclick="submitGuardReport()">
+      <span>🚀 పంపండి</span>
+      <span class="send-btn-sub">SEND TO CONTROL ROOM</span>
+    </button>
+
+    <!-- Navigation Buttons -->
+    <div class="bottom-bar">
+      <button class="nav-btn" onclick="goToScreen(2)">
+        &larr; వెనుకకు / Back
+      </button>
+      <button class="nav-btn" onclick="goToScreen(1)">
+        🏠 మొదటికి / Home
+      </button>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: Confirmation with Green Tick -->
+  <div class="app-screen" id="screen-4">
+    <div class="tick-box">
+      <div class="giant-tick">✓</div>
+      
+      <div class="prompt-te" style="color: #16a34a; font-size: 1.6rem;">
+        పంపబడింది!
+      </div>
+      <div class="prompt-en" style="color: #15803d; font-size: 1.1rem; font-weight: 800;">
+        Officer is Alerted!
+      </div>
+      
+      <p style="font-size: 0.95rem; color: #334155; margin: 12px 0 6px;">
+        సహాయక అధికారి వెంటనే పరిశీలిస్తారు.
+      </p>
+      <p style="font-size: 0.82rem; color: #64748b;">
+        Quick-response staff has been notified.
+      </p>
+
+      <!-- Offline Notice if queued -->
+      <div class="offline-banner" id="offline-saved-msg">
+        📶 సిగ్నల్ లేదు: ఫోన్‌లో భద్రపరచబడింది.<br>
+        ఇంటర్నెట్ రాగానే ఆటోమేటిక్‌గా పంపబడుతుంది.
+      </div>
+
+      <!-- Reference Number -->
+      <div style="background: #ffffff; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 14px; margin: 20px 0;">
+        <div style="font-size: 0.78rem; color: #64748b; font-weight: 700;">రిఫరెన్స్ నంబర్ / REFERENCE NO:</div>
+        <div style="font-size: 1.8rem; font-weight: 900; color: #0a192f; letter-spacing: 1px;" id="conf-ref-no">
+          GRD-0001
+        </div>
+        <div style="font-size: 0.82rem; color: #475569; margin-top: 4px;" id="conf-details">
+          పుష్కర్ ఘాట్ &bull; 🚽 మరుగుదొడ్డి
+        </div>
+      </div>
+
+      <!-- Big Button to Report Another -->
+      <button class="big-btn" onclick="resetToNewReport()" style="border: 2px solid #16a34a; background: #f0fdf4; justify-content: center; min-height: 64px;">
+        <span style="font-size: 1.4rem;">➕</span>
+        <div style="text-align: center;">
+          <div class="big-btn-te" style="color: #15803d;">మరొక సమస్య నివేదించండి</div>
+          <div class="big-btn-en" style="color: #166534;">Report Another Problem</div>
+        </div>
+      </button>
+
+      <div style="margin-top: 14px;">
+        <button class="nav-btn" onclick="goToScreen(1)" style="width: 100%;">
+          🏠 మొదటి పేజీకి / Return Home
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- STATE VARIABLES ---
+    let currentPin = '';
+    let selectedGhat = null;
+    let selectedIssue = null;
+    let compressedPhotoBase64 = null;
+    let currentLang = localStorage.getItem('guard_lang') || 'te';
+
+    // --- SERVICE WORKER REGISTRATION ---
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/guard-sw.js').catch(err => console.log('SW reg error:', err));
+      });
+    }
+
+    // --- NETWORK STATUS TRACKING ---
+    function updateOnlineStatus() {
+      const dot = document.getElementById('online-dot');
+      if (navigator.onLine) {
+        dot.className = 'status-dot';
+        dot.title = 'ఆన్‌లైన్ / Online';
+        retryPendingReports();
+      } else {
+        dot.className = 'status-dot offline';
+        dot.title = 'ఆఫ్‌లైన్ / Offline';
+      }
+    }
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+
+    // --- INITIALIZATION ---
+    document.addEventListener('DOMContentLoaded', () => {
+      updateOnlineStatus();
+      updatePendingBadge();
+
+      // Check PIN Auth
+      const isAuth = localStorage.getItem('guard_pin_auth') === 'true';
+      if (!isAuth) {
+        showScreen('pin');
+      } else {
+        // Load last chosen ghat
+        const lastGhatId = localStorage.getItem('guard_last_ghat_id');
+        if (lastGhatId) {
+          const btn = document.getElementById('ghat-btn-' + lastGhatId);
+          if (btn) btn.classList.add('selected');
+        }
+        showScreen('1');
+      }
+    });
+
+    // --- SCREEN SWITCHER ---
+    function showScreen(screenId) {
+      document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active'));
+      const target = document.getElementById('screen-' + screenId);
+      if (target) {
+        target.classList.add('active');
+        window.scrollTo(0, 0);
+      }
+    }
+
+    function goToScreen(num) {
+      showScreen(String(num));
+    }
+
+    // --- PIN SYSTEM ---
+    function pressPin(digit) {
+      if (currentPin.length < 4) {
+        currentPin += digit;
+        updatePinDots();
+        if (currentPin.length === 4) {
+          setTimeout(checkPin, 150);
+        }
+      }
+    }
+
+    function clearPin() {
+      currentPin = '';
+      updatePinDots();
+    }
+
+    function updatePinDots() {
+      for (let i = 0; i < 4; i++) {
+        const d = document.getElementById('dot-' + i);
+        if (d) {
+          d.className = i < currentPin.length ? 'pin-dot filled' : 'pin-dot';
+        }
+      }
+    }
+
+    function checkPin() {
+      if (currentPin === '1234') {
+        localStorage.setItem('guard_pin_auth', 'true');
+        localStorage.setItem('guard_name', 'రాము / Ramu');
+        currentPin = '';
+        updatePinDots();
+        showScreen('1');
+      } else {
+        alert('తప్పు పిన్! డెమో పిన్ 1234 నమోదు చేయండి. / Wrong PIN! Enter 1234.');
+        clearPin();
+      }
+    }
+
+    function logoutGuard() {
+      if (confirm('లాగౌట్ చేయాలా? / Logout?')) {
+        localStorage.removeItem('guard_pin_auth');
+        clearPin();
+        showScreen('pin');
+      }
+    }
+
+    // --- STEP 1: CHOOSE GHAT (TAP 1) ---
+    function chooseGhat(id, nameTe, nameEn) {
+      selectedGhat = { id: id, nameTe: nameTe, nameEn: nameEn };
+      localStorage.setItem('guard_last_ghat_id', id);
+
+      // Highlight button
+      document.querySelectorAll('#screen-1 .big-btn').forEach(b => b.classList.remove('selected'));
+      const activeBtn = document.getElementById('ghat-btn-' + id);
+      if (activeBtn) activeBtn.classList.add('selected');
+
+      // Populate summary on Screen 3
+      document.getElementById('summary-ghat-te').innerText = nameTe;
+      document.getElementById('summary-ghat-en').innerText = nameEn;
+
+      // Immediate move to Screen 2
+      showScreen('2');
+    }
+
+    // --- STEP 2: CHOOSE ISSUE (TAP 2) ---
+    function chooseIssue(type, icon, labelTe, labelEn) {
+      selectedIssue = { type: type, icon: icon, labelTe: labelTe, labelEn: labelEn };
+
+      // Populate summary on Screen 3
+      document.getElementById('summary-issue-icon').innerText = icon;
+      document.getElementById('summary-issue-te').innerText = labelTe;
+      document.getElementById('summary-issue-en').innerText = labelEn;
+
+      // Reset photo & note
+      removePhoto();
+      document.getElementById('guard-note-input').value = '';
+
+      // Immediate move to Screen 3
+      showScreen('3');
+    }
+
+    // --- PHOTO HANDLING: COMPRESS IN BROWSER TO UNDER 150KB ---
+    function handlePhotoSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const img = new Image();
+        img.onload = function() {
+          // Resize dimension to max 800px
+          let width = img.width;
+          let height = img.height;
+          const maxDim = 800;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // JPEG Quality 0.6 ensures size ~60KB - 120KB
+          compressedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.6);
+          document.getElementById('photo-preview-img').src = compressedPhotoBase64;
+          document.getElementById('photo-preview-wrap').style.display = 'block';
+          document.getElementById('photo-btn-text').innerText = '✓ ఫోటో తీయబడింది / Photo Ready';
+        };
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removePhoto() {
+      compressedPhotoBase64 = null;
+      document.getElementById('guard-photo-input').value = '';
+      document.getElementById('photo-preview-wrap').style.display = 'none';
+      document.getElementById('photo-btn-text').innerText = 'ఫోటో తీయండి (ఐచ్ఛికం / Optional)';
+    }
+
+    // --- STEP 3: SEND REPORT (TAP 3) ---
+    async function submitGuardReport() {
+      if (!selectedGhat || !selectedIssue) {
+        alert('దయచేసి ఘాట్ మరియు సమస్య ఎంచుకోండి');
+        return;
+      }
+
+      const sendBtn = document.getElementById('btn-send-report');
+      sendBtn.disabled = true;
+      sendBtn.innerText = 'పంపుతోంది... / Sending...';
+
+      const payload = {
+        ghat_id: selectedGhat.id,
+        issue_type: selectedIssue.type,
+        note: document.getElementById('guard-note-input').value.trim(),
+        photo: compressedPhotoBase64,
+        guard_name: localStorage.getItem('guard_name') || 'రాము / Ramu'
+      };
+
+      try {
+        const res = await fetch('/api/guard/report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          showConfirmation(data.ref_no, false);
+        } else {
+          throw new Error('Server returned error');
+        }
+      } catch (err) {
+        // OFFLINE FALLBACK: Save report to localStorage queue
+        saveReportOffline(payload);
+        const offlineRef = 'OFF-' + Math.floor(1000 + Math.random() * 9000);
+        showConfirmation(offlineRef, true);
+      } finally {
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = '<span>🚀 పంపండి</span><span class="send-btn-sub">SEND TO CONTROL ROOM</span>';
+      }
+    }
+
+    // --- STEP 4: CONFIRMATION SCREEN ---
+    function showConfirmation(refNo, isOffline) {
+      document.getElementById('conf-ref-no').innerText = refNo;
+      document.getElementById('conf-details').innerHTML = 
+        `${selectedGhat.nameTe} &bull; ${selectedIssue.icon} ${selectedIssue.labelTe}`;
+      
+      const offlineMsg = document.getElementById('offline-saved-msg');
+      if (offlineMsg) {
+        offlineMsg.style.display = isOffline ? 'block' : 'none';
+      }
+
+      showScreen('4');
+    }
+
+    function resetToNewReport() {
+      // Keeps same Ghat, allows reporting another issue
+      showScreen('2');
+    }
+
+    // --- OFFLINE QUEUE IN LOCALSTORAGE ---
+    function saveReportOffline(payload) {
+      let queue = [];
+      try {
+        queue = JSON.parse(localStorage.getItem('pending_guard_reports') || '[]');
+      } catch (e) { queue = []; }
+      queue.push(payload);
+      localStorage.setItem('pending_guard_reports', JSON.stringify(queue));
+      updatePendingBadge();
+    }
+
+    function updatePendingBadge() {
+      let queue = [];
+      try {
+        queue = JSON.parse(localStorage.getItem('pending_guard_reports') || '[]');
+      } catch (e) { queue = []; }
+
+      const badge = document.getElementById('pending-badge');
+      if (badge) {
+        if (queue.length > 0) {
+          badge.style.display = 'inline-block';
+          badge.innerText = `📥 ${queue.length} పెండింగ్`;
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+    }
+
+    async function retryPendingReports() {
+      if (!navigator.onLine) return;
+      let queue = [];
+      try {
+        queue = JSON.parse(localStorage.getItem('pending_guard_reports') || '[]');
+      } catch (e) { return; }
+
+      if (queue.length === 0) return;
+
+      const remaining = [];
+      for (const item of queue) {
+        try {
+          const res = await fetch('/api/guard/report', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(item)
+          });
+          if (!res.ok) remaining.push(item);
+        } catch (e) {
+          remaining.push(item);
+        }
+      }
+
+      localStorage.setItem('pending_guard_reports', JSON.stringify(remaining));
+      updatePendingBadge();
+    }
+
+    // --- LANGUAGE TOGGLE ---
+    function toggleLanguage() {
+      currentLang = currentLang === 'te' ? 'en' : 'te';
+      localStorage.setItem('guard_lang', currentLang);
+      const btn = document.getElementById('lang-btn');
+      if (btn) btn.innerText = currentLang === 'te' ? '🌐 తెలుగు' : '🌐 English';
+    }
+  </script>
+</body>
+</html>
+
