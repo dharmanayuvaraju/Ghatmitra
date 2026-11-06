@@ -275,6 +275,27 @@ function renderDemoStep() {
   document.getElementById('demo-step-title').innerText = current.title;
   document.getElementById('demo-step-text').innerText = current.text;
 
+  // Step 1: Dynamically load live KPIs from /api/summary instead of hardcoded text
+  if (demoCurrentStep === 1) {
+    fetch('/api/summary')
+      .then(res => res.json())
+      .then(summary => {
+        const delayedCount = summary?.counts_by_status?.delayed ?? 0;
+        const totalWorks = summary?.total_works ?? 30;
+        const delayedPct = totalWorks > 0 ? Math.round((delayedCount / totalWorks) * 100) : 0;
+        const delayedBudget = summary?.budget?.delayed_budget ?? 0;
+        const budgetRiskCr = (delayedBudget / 10000000).toFixed(2);
+        
+        const dynamicText = `Notice the executive KPIs at the top: ${totalWorks} Works across 5 Ghats, with ${delayedCount} Delayed Works (${delayedPct}%) and ₹${budgetRiskCr} Cr of Budget at Risk. The spatial map shows all delayed sites in red.`;
+        demoSteps[0].text = dynamicText;
+        const stepEl = document.getElementById('demo-step-text');
+        if (stepEl && demoCurrentStep === 1) {
+          stepEl.innerText = dynamicText;
+        }
+      })
+      .catch(e => console.warn("Demo step 1 summary load error:", e));
+  }
+
   // Clear previous spotlights
   document.querySelectorAll('.demo-spotlight').forEach(el => el.classList.remove('demo-spotlight'));
 
@@ -346,13 +367,23 @@ document.addEventListener('DOMContentLoaded', () => {
 // CONTROL ROOM ANIMATIONS & LITE MODE CONTROLLER
 // ==========================================================================
 
-// 1. Lite Mode Toggle
+// 1. Lite Mode Toggle (Auto-enabled below 600px)
 function initLiteMode() {
-  const isLite = localStorage.getItem('pwt_lite_mode') === 'true';
+  const isMobileScreen = window.innerWidth <= 600;
+  const storedLite = localStorage.getItem('pwt_lite_mode');
+  const isLite = isMobileScreen || storedLite === 'true';
   document.documentElement.classList.toggle('lite-mode', isLite);
   const textEl = document.getElementById('lite-mode-status');
   if (textEl) textEl.innerText = isLite ? '🍃 Lite Mode: ON' : '⚡ Lite Mode: OFF';
+  updateMobileSheetLiteLabel();
 }
+
+window.addEventListener('resize', () => {
+  if (window.innerWidth <= 600) {
+    document.documentElement.classList.add('lite-mode');
+    updateMobileSheetLiteLabel();
+  }
+});
 
 function toggleLiteMode() {
   const isLite = document.documentElement.classList.toggle('lite-mode');
@@ -487,12 +518,19 @@ function playAlertChime() {
   }
 }
 
+// Beep OFF by default (clear any previously stored value that turned it on)
+if (localStorage.getItem('ghatmitra_sound_default_off_v3') !== 'true') {
+  localStorage.removeItem('ghatmitra_sound');
+  localStorage.setItem('ghatmitra_sound_default_off_v3', 'true');
+}
+
 function initSoundToggle() {
   const soundEnabled = localStorage.getItem('ghatmitra_sound') === 'true';
   const icon = document.getElementById('sound-icon');
   const label = document.getElementById('sound-label');
   if (icon) icon.innerText = soundEnabled ? '🔔' : '🔕';
   if (label) label.innerText = soundEnabled ? 'Beep: On' : 'Beep: Off';
+  updateMobileSheetSoundLabel();
 }
 
 function toggleAudioBeep() {
@@ -506,6 +544,50 @@ function toggleAudioBeep() {
   } else {
     showToast("Audio chime turned OFF", "info");
   }
+}
+
+// Mobile More / Settings Bottom Sheet Handlers
+function toggleMobileMoreMenu(e) {
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  const backdrop = document.getElementById('mobile-more-backdrop');
+  const sheet = document.getElementById('mobile-more-sheet');
+  if (sheet) {
+    const isOpen = sheet.classList.contains('active');
+    if (isOpen) {
+      closeMobileMoreMenu();
+    } else {
+      if (backdrop) backdrop.classList.add('active');
+      sheet.classList.add('active');
+      updateMobileSheetSoundLabel();
+      updateMobileSheetLiteLabel();
+    }
+  }
+}
+
+function closeMobileMoreMenu() {
+  const backdrop = document.getElementById('mobile-more-backdrop');
+  const sheet = document.getElementById('mobile-more-sheet');
+  if (backdrop) backdrop.classList.remove('active');
+  if (sheet) sheet.classList.remove('active');
+}
+
+function updateMobileSheetSoundLabel() {
+  const soundEnabled = localStorage.getItem('ghatmitra_sound') === 'true';
+  const mobIcon = document.getElementById('mob-sound-icon');
+  const mobLabel = document.getElementById('mob-sound-label');
+  if (mobIcon) mobIcon.innerText = soundEnabled ? '🔔' : '🔕';
+  if (mobLabel) mobLabel.innerText = soundEnabled ? 'Audio Beep: ON' : 'Audio Beep: OFF';
+}
+
+function updateMobileSheetLiteLabel() {
+  const isLite = document.documentElement.classList.contains('lite-mode');
+  const mobIcon = document.getElementById('mob-lite-icon');
+  const mobLabel = document.getElementById('mob-lite-label');
+  if (mobIcon) mobIcon.innerText = isLite ? '🍃' : '⚡';
+  if (mobLabel) mobLabel.innerText = isLite ? 'Lite Mode: ON' : 'Lite Mode: OFF';
 }
 
 // ==========================================================================
@@ -632,13 +714,29 @@ async function fetchHubCounts() {
     const assetsFaulty = data.assets_faulty ?? data.faulty_assets ?? 0;
     const alertsOpen = data.alerts_open ?? data.open_alerts ?? 0;
     const vendorsLowest = data.vendors_lowest_score ?? data.lowest_vendor_score ?? 0;
+    const guardReports = data.guard_reports_today ?? 0;
+    const engineerUpdates = data.engineer_updates_today ?? 0;
 
-    updateTileBadge('tile-count-guard', data.guard_reports_today ?? 0);
-    updateTileBadge('tile-count-engineer', data.engineer_updates_today ?? 0);
+    // Feature Tiles
+    updateTileBadge('tile-count-guard', guardReports);
+    updateTileBadge('tile-count-engineer', engineerUpdates);
     updateTileBadge('tile-count-works', worksDelayed);
     updateTileBadge('tile-count-assets', assetsFaulty);
     updateTileBadge('tile-count-vendors', vendorsLowest);
     updateTileBadge('tile-count-alerts', alertsOpen);
+
+    // Nav Badges: use the same values as the tiles
+    updateNavBadge('nav-badge-guard', guardReports);
+    updateNavBadge('nav-badge-field', engineerUpdates);
+    updateNavBadge('nav-badge-works', worksDelayed);
+    updateNavBadge('nav-badge-assets', assetsFaulty);
+    updateNavBadge('nav-badge-vendors', vendorsLowest);
+    updateNavBadge('nav-badge-alerts', alertsOpen);
+
+    // Mobile Bottom Tab Badges
+    updateNavBadge('mob-badge-guard', guardReports);
+    updateNavBadge('mob-badge-works', worksDelayed);
+    updateNavBadge('mob-badge-assets', assetsFaulty);
 
   } catch (e) {
     const dotEl = document.getElementById('live-sync-dot');
@@ -652,6 +750,33 @@ function updateTileBadge(id, val) {
     el.innerText = (val !== undefined && val !== null) ? val : 0;
   }
 }
+
+function updateNavBadge(id, val) {
+  const el = document.getElementById(id);
+  if (el) {
+    const count = (val !== undefined && val !== null) ? val : 0;
+    el.innerText = count;
+    el.style.display = 'inline-block';
+  }
+}
+
+// Client-Side Layout Overflow Diagnostic Auditor
+function auditMobileLayoutOverflow() {
+  const winW = window.innerWidth;
+  const docW = document.documentElement.scrollWidth;
+  if (docW > winW) {
+    console.warn(`[Layout Audit] Overflow detected! Window width: ${winW}px, document scrollWidth: ${docW}px`);
+    document.querySelectorAll('*').forEach(el => {
+      if (el.scrollWidth > winW) {
+        console.warn(`[Overflowing Element] <${el.tagName} id="${el.id}" class="${el.className}"> scrollWidth: ${el.scrollWidth}px > ${winW}px`);
+      }
+    });
+  } else {
+    console.log(`[Layout Audit OK] Document width matches viewport: scrollWidth=${docW}px <= window=${winW}px`);
+  }
+}
+window.addEventListener('load', auditMobileLayoutOverflow);
+window.addEventListener('resize', auditMobileLayoutOverflow);
 
 function startHubPolling() {
   fetchHubCounts();

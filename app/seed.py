@@ -133,7 +133,7 @@ def seed_db():
             "mobile toilet": ["Bio-Toilet Trailer A", "Express Sanitation Pod B", "Women's Hygiene Unit C", "Elder-Accessible Cabin D"],
             "bin": ["Twin Smart Compactor Bin", "Stainless Litter Receptacle", "Segregated High-Cap Drum", "Wet-Dry Recycling Station"],
             "light": ["High-Mast Mast 1", "Solar Flood Unit 4", "LED Tower Beacon 2", "Promenade Strip Array"],
-            "CCTV": ["360 PTZ Surveillance Cam", "Facial Density Cam 08", "Waterfront Night-Vision IP Cam", "Crowd Flow Sensor Unit"],
+            "CCTV": ["360 PTZ Surveillance Cam", "Crowd Density Cam 08", "Waterfront Night-Vision IP Cam", "Crowd Flow Sensor Unit"],
             "generator": ["125 kVA Silent DG Set", "250 kVA Prime Power Genset", "75 kVA Mobile Backup Trailer", "160 kVA Emergency Genset"]
         }
 
@@ -284,7 +284,7 @@ def seed_db():
             WorkUpdate(work_id=16, progress_pct=82, note="Water chilling plant operational; output temperature maintained at 18 degrees Celsius.", photo_url=None, updated_by="Ch. Subba Rao (Jaladhara)", created_at=now - timedelta(hours=12)),
             WorkUpdate(work_id=17, progress_pct=68, note="Saraswati bathing platform flagstone joints sealed with epoxy water-resistant mortar.", photo_url=None, updated_by="Ravi Varma (Godavari Infra)", created_at=now - timedelta(days=2, hours=8)),
             WorkUpdate(work_id=18, progress_pct=75, note="VIP protocol air-conditioned waiting cabin interior acoustic paneling installed.", photo_url=None, updated_by="B. Nagesh (Fabricator)", created_at=now - timedelta(hours=20)),
-            WorkUpdate(work_id=19, progress_pct=100, note="Commissioning certificate issued for Pushkar Central Steps. Handed over to Municipal Commissioner.", photo_url="/static/img/updates/commissioning.jpg", updated_by="Superintending Engineer (R&B)", created_at=now - timedelta(days=4)),
+            WorkUpdate(work_id=19, progress_pct=60, note="Reinforced nylon safety netting secured along 350m river approach stretch; tension cable clamps verified.", photo_url="/static/img/updates/barricades.jpg", updated_by="M. Anitha (Apex Safety)", created_at=now - timedelta(days=1, hours=8)),
         ]
         db.add_all(updates_data)
         db.commit()

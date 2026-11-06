@@ -709,5 +709,21 @@ def test_real_time_guard_report_api_flow(db_session):
     new_counts = api_hub_counts(db_session)
     assert new_counts["guard_reports_today"] >= init_guards
 
+def test_no_facial_cams_in_assets_or_seed(db_session):
+    """Verify that no asset names contain 'facial' (case-insensitive)."""
+    facial_assets = db_session.query(Asset).filter(Asset.name.ilike("%facial%")).all()
+    assert len(facial_assets) == 0, f"Found assets with 'facial': {[a.name for a in facial_assets]}"
+
+def test_work_19_seed_consistency(db_session):
+    """Verify that work #19's progress, status and update note match."""
+    w19 = db_session.query(Work).filter(Work.id == 19).first()
+    if w19:
+        u19 = db_session.query(WorkUpdate).filter(WorkUpdate.work_id == 19).first()
+        if u19:
+            assert u19.progress_pct == w19.progress_pct
+            assert "Pushkar Central Steps" not in u19.note
+            assert "safety netting" in u19.note.lower() or "barricade" in u19.note.lower()
+
+
 
 
